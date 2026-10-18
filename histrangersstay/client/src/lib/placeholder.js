@@ -1,0 +1,4 @@
+// Dummy image (inline SVG, no network needed). Shown in the admin until a photo is uploaded,
+// and on the website when an image is missing.
+const svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 600"><defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#e9dcc0"/><stop offset="1" stop-color="#9cc5b5"/></linearGradient></defs><rect width="800" height="600" fill="url(#g)"/><circle cx="590" cy="170" r="52" fill="#fff" fill-opacity=".65"/><path d="M0 470 230 270 360 390 520 230 800 470V600H0Z" fill="#fff" fill-opacity=".55"/><path d="M0 520 190 380 330 480 520 340 800 520V600H0Z" fill="#16302a" fill-opacity=".35"/><text x="400" y="565" text-anchor="middle" font-family="Arial,sans-serif" font-size="28" fill="#16302a" fill-opacity=".7">Dummy image</text></svg>`;
+export const PLACEHOLDER = `data:image/svg+xml;utf8,${encodeURIComponent(svg)}`;
