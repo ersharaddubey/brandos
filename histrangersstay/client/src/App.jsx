@@ -26,6 +26,12 @@ import Login from './pages/Login';
 import Register from './pages/Register';
 import Account from './pages/Account';
 import Invoice from './pages/Invoice';
+import Cafe from './pages/Cafe';
+import CafeBill from './pages/CafeBill';
+import CheckIn from './pages/CheckIn';
+import Locations from './pages/Locations';
+import Leadership from './pages/Leadership';
+import Volunteer from './pages/Volunteer';
 
 // The admin panel (and its own stylesheet) only loads when /admin is opened
 const AdminLogin = lazy(() => import('./admin/AdminLogin'));
@@ -39,6 +45,12 @@ const GalleryAdmin = lazy(() => import('./admin/GalleryAdmin'));
 const VideosAdmin = lazy(() => import('./admin/VideosAdmin'));
 const ReviewsAdmin = lazy(() => import('./admin/ReviewsAdmin'));
 const FoodAdmin = lazy(() => import('./admin/FoodAdmin'));
+const CafeOrdersAdmin = lazy(() => import('./admin/CafeOrdersAdmin'));
+const BillingAdmin = lazy(() => import('./admin/BillingAdmin'));
+const CheckInsAdmin = lazy(() => import('./admin/CheckInsAdmin'));
+const VolunteersAdmin = lazy(() => import('./admin/VolunteersAdmin'));
+const LocationsAdmin = lazy(() => import('./admin/LocationsAdmin'));
+const TeamAdmin = lazy(() => import('./admin/TeamAdmin'));
 
 function ScrollTop() {
   const { pathname, hash } = useLocation();
@@ -99,16 +111,22 @@ export default function App() {
             <Route path="/login" element={<Login />} />
             <Route path="/register" element={<Register />} />
             <Route path="/account" element={<Account />} />
+            <Route path="/cafe" element={<Cafe />} />
+            <Route path="/checkin" element={<CheckIn />} />
+            <Route path="/locations" element={<Locations />} />
+            <Route path="/leadership" element={<Leadership />} />
+            <Route path="/volunteer" element={<Volunteer />} />
             {/* Old multi-hotel links now point to the single property */}
             <Route path="/hotels" element={<Navigate to="/stay" replace />} />
             <Route path="/hotels/:slug" element={<Navigate to="/stay" replace />} />
             <Route path="/destinations" element={<Navigate to="/nearby" replace />} />
             <Route path="/dining" element={<Navigate to="/experiences" replace />} />
-                        <Route path="/wellness" element={<Navigate to="/experiences" replace />} />
+            <Route path="/wellness" element={<Navigate to="/experiences" replace />} />
             <Route path="*" element={<NotFound />} />
           </Route>
           {/* Printable invoice: standalone page without the site header and footer */}
           <Route path="/invoice/:id" element={<Invoice />} />
+          <Route path="/cafe-bill/:orderNo" element={<CafeBill />} />
           <Route path="/admin/login" element={<AdminLogin />} />
           <Route path="/admin" element={<AdminLayout />}>
             <Route index element={<Dashboard />} />
@@ -117,6 +135,12 @@ export default function App() {
             <Route path="bookings" element={<BookingsAdmin />} />
             <Route path="offers" element={<OffersAdmin />} />
             <Route path="food" element={<FoodAdmin />} />
+            <Route path="cafe" element={<CafeOrdersAdmin />} />
+            <Route path="billing" element={<BillingAdmin />} />
+            <Route path="checkins" element={<CheckInsAdmin />} />
+            <Route path="volunteers" element={<VolunteersAdmin />} />
+            <Route path="locations" element={<LocationsAdmin />} />
+            <Route path="team" element={<TeamAdmin />} />
             <Route path="gallery" element={<GalleryAdmin />} />
             <Route path="videos" element={<VideosAdmin />} />
             <Route path="reviews" element={<ReviewsAdmin />} />

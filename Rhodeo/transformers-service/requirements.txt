@@ -1,0 +1,6 @@
+fastapi>=0.115,<1
+uvicorn[standard]>=0.30,<1
+transformers>=4.45,<5
+torch>=2.4
+pillow>=10
+python-multipart>=0.0.9

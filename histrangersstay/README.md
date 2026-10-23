@@ -24,7 +24,7 @@ Old links `/hotels`, `/hotels/:slug`, `/destinations`, `/dining`, `/wellness` re
 cp server/.env.example server/.env
 npm run install:all
 npm run seed          # property + 3 rooms + 3 SAMPLE offers + admin user
-npm run dev:server    # http://localhost:5001
+npm run dev:server    # http://localhost:5003
 npm run dev:client    # http://localhost:5173
 ```
 

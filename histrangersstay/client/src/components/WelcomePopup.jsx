@@ -30,7 +30,7 @@ export default function WelcomePopup() {
       try { window.localStorage.setItem(KEY, String(Date.now())); } catch { /* ignore */ }
       setOpen(true);
     };
-    const timer = window.setTimeout(show, 5001);
+    const timer = window.setTimeout(show, 5003);
     return () => window.clearTimeout(timer);
   }, [enabled]);
 

@@ -1,78 +1,151 @@
-require('dotenv').config();
-const mongoose = require('mongoose');
-const User = require('./models/User');
-const Hotel = require('./models/Hotel');
-const Room = require('./models/Room');
-const Offer = require('./models/Offer');
-const Booking = require('./models/Booking');
-const Settings = require('./models/Settings');
-const Review = require('./models/Review');
-const FoodItem = require('./models/FoodItem');
-const foodItems = require('./data-food');
-
-// Sample photos from Unsplash. Replace them from the admin panel with your own property photos.
-const U = (id) => `https://images.unsplash.com/${id}?auto=format&fit=crop&w=1600&q=70`;
-const IMG = [
-  U('photo-1555854877-bab0e564b8d5'),
-  U('photo-1520250497591-112f2f40a3f4'),
-  U('photo-1506905925346-21bda4d32df4'),
+// Hi Strangers Stay food menu (from Hi-Strangers-Stay-Menu-3.pdf). Prices in INR, GST included.
+// Cold Drinks are sold at MRP so they are not listed here. Edit anything later in Admin > Food menu.
+module.exports = [
+  { category: "Breakfast", name: "Aloo Paratha (2 pcs)", price: 120, veg: true, order: 1 },
+  { category: "Breakfast", name: "Paneer Paratha (2 pcs)", price: 180, veg: true, order: 2 },
+  { category: "Breakfast", name: "Pyaaz Paratha", price: 70, veg: true, order: 3 },
+  { category: "Breakfast", name: "Gobhi Paratha", price: 80, veg: true, order: 4 },
+  { category: "Breakfast", name: "Egg Paratha", price: 160, veg: false, order: 5 },
+  { category: "Breakfast", name: "Aloo Puri (4 pcs)", price: 150, veg: true, order: 6 },
+  { category: "Breakfast", name: "Chole Bhature", price: 160, veg: true, order: 7 },
+  { category: "Breakfast", name: "Besan Chilla", price: 80, veg: true, order: 8 },
+  { category: "Breakfast", name: "Besan Paneer Chilla", price: 100, veg: true, order: 9 },
+  { category: "Breakfast", name: "Omelette (2 eggs)", price: 60, veg: false, order: 10 },
+  { category: "Breakfast", name: "Boiled / Fried Eggs", price: 40, veg: false, order: 11 },
+  { category: "Breakfast", name: "Bread Butter & Jam", price: 40, veg: true, order: 12 },
+  { category: "Breakfast", name: "Nutella Toast", price: 100, veg: true, order: 13 },
+  { category: "Breakfast", name: "Poha", price: 100, veg: true, order: 14 },
+  { category: "Breakfast", name: "Upma", price: 100, veg: true, order: 15 },
+  { category: "Breakfast", name: "Porridge / Oats", price: 90, veg: true, order: 16 },
+  { category: "Himachal Specials", name: "Dham Thali (Chef's Special)", price: 500, veg: true, order: 1 },
+  { category: "Himachal Specials", name: "Local Chicken Curry", price: 280, veg: false, order: 2 },
+  { category: "Himachal Specials", name: "Trout Fish, Pahadi (Seasonal)", price: 700, veg: false, order: 3 },
+  { category: "Himachal Specials", name: "Plain Siddu", price: 100, veg: true, order: 4 },
+  { category: "Himachal Specials", name: "Walnut & Poppy Siddu", price: 150, veg: true, order: 5 },
+  { category: "Himachal Specials", name: "Paneer Siddu", price: 200, veg: true, order: 6 },
+  { category: "Himachal Specials", name: "Local Rajma", price: 200, veg: true, order: 7 },
+  { category: "Shakes & Drinks", name: "Mango Shake", price: 100, veg: true, order: 1 },
+  { category: "Shakes & Drinks", name: "Banana Shake", price: 80, veg: true, order: 2 },
+  { category: "Shakes & Drinks", name: "Strawberry Shake", price: 100, veg: true, order: 3 },
+  { category: "Shakes & Drinks", name: "Oreo Shake", price: 120, veg: true, order: 4 },
+  { category: "Shakes & Drinks", name: "Kit Kat Shake", price: 120, veg: true, order: 5 },
+  { category: "Shakes & Drinks", name: "Cold Coffee", price: 90, veg: true, order: 6 },
+  { category: "Shakes & Drinks", name: "Cold Coffee with Ice Cream", price: 150, veg: true, order: 7 },
+  { category: "Shakes & Drinks", name: "Lemon Soda / Lemonade", price: 80, veg: true, order: 8 },
+  { category: "Shakes & Drinks", name: "Virgin Mojito", price: 100, veg: true, order: 9 },
+  { category: "Shakes & Drinks", name: "Sweet / Salted Lassi", price: 90, veg: true, order: 10 },
+  { category: "Shakes & Drinks", name: "Hot Chocolate", price: 90, veg: true, order: 11 },
+  { category: "Shakes & Drinks", name: "Hot Coffee", price: 50, veg: true, order: 12 },
+  { category: "Shakes & Drinks", name: "Espresso", price: 120, veg: true, order: 13 },
+  { category: "Shakes & Drinks", name: "Cafe Latte", price: 140, veg: true, order: 14 },
+  { category: "Shakes & Drinks", name: "Cappuccino", price: 150, veg: true, order: 15 },
+  { category: "Shakes & Drinks", name: "Hazelnut Coffee", price: 170, veg: true, order: 16 },
+  { category: "Shakes & Drinks", name: "Plain Chai / Black Tea", price: 30, veg: true, order: 17 },
+  { category: "Shakes & Drinks", name: "Masala Chai (Signature)", price: 40, veg: true, order: 18 },
+  { category: "Shakes & Drinks", name: "Masala Ginger Tea", price: 40, veg: true, order: 19 },
+  { category: "Shakes & Drinks", name: "Special Adrak Elaichi Tea", price: 60, veg: true, order: 20 },
+  { category: "Shakes & Drinks", name: "Green Tea", price: 60, veg: true, order: 21 },
+  { category: "Shakes & Drinks", name: "Ginger Lemon Tea", price: 60, veg: true, order: 22 },
+  { category: "Shakes & Drinks", name: "Ginger Lemon Honey", price: 70, veg: true, order: 23 },
+  { category: "Shakes & Drinks", name: "Bottled Water", price: 20, veg: true, order: 24 },
+  { category: "Desserts", name: "Kheer", price: 100, veg: true, order: 1 },
+  { category: "Desserts", name: "Ice Cream (2 scoops)", price: 100, veg: true, order: 2 },
+  { category: "Desserts", name: "Suji Halwa", price: 150, veg: true, order: 3 },
+  { category: "Desserts", name: "Fruit Custard", price: 180, veg: true, order: 4 },
+  { category: "Desserts", name: "Brownie with Ice Cream", price: 200, veg: true, order: 5 },
+  { category: "Snacks", name: "Veg Pakora", price: 180, veg: true, order: 1 },
+  { category: "Snacks", name: "Chicken Pakora", price: 320, veg: false, order: 2 },
+  { category: "Snacks", name: "Bread Pakora", price: 70, veg: true, order: 3 },
+  { category: "Snacks", name: "Paneer Tikka", price: 300, veg: true, order: 4 },
+  { category: "Snacks", name: "Chicken Tikka", price: 380, veg: false, order: 5 },
+  { category: "Snacks", name: "French Fries", price: 120, veg: true, order: 6 },
+  { category: "Snacks", name: "Egg Bhurji", price: 90, veg: false, order: 7 },
+  { category: "Snacks", name: "Peanut Masala", price: 100, veg: true, order: 8 },
+  { category: "Snacks", name: "Veg Momos (10 pc)", price: 180, veg: true, order: 9 },
+  { category: "Snacks", name: "Paneer Momos (10 pc)", price: 200, veg: true, order: 10 },
+  { category: "Snacks", name: "Chicken Momos (10 pc)", price: 220, veg: false, order: 11 },
+  { category: "Snacks", name: "Fried Veg Momos (10 pc)", price: 180, veg: true, order: 12 },
+  { category: "Snacks", name: "Fried Paneer Momos", price: 200, veg: true, order: 13 },
+  { category: "Snacks", name: "Fried Chicken Momos", price: 240, veg: false, order: 14 },
+  { category: "Sandwich & Burger", name: "Veg Sandwich", price: 100, veg: true, order: 1 },
+  { category: "Sandwich & Burger", name: "Aloo Sandwich", price: 100, veg: true, order: 2 },
+  { category: "Sandwich & Burger", name: "Paneer Sandwich", price: 150, veg: true, order: 3 },
+  { category: "Sandwich & Burger", name: "Veg Club Sandwich", price: 150, veg: true, order: 4 },
+  { category: "Sandwich & Burger", name: "Chicken Club Sandwich", price: 180, veg: false, order: 5 },
+  { category: "Sandwich & Burger", name: "Cheese Grilled Sandwich", price: 160, veg: true, order: 6 },
+  { category: "Sandwich & Burger", name: "Paneer Tikka Sandwich", price: 180, veg: true, order: 7 },
+  { category: "Sandwich & Burger", name: "Egg Sandwich", price: 120, veg: false, order: 8 },
+  { category: "Sandwich & Burger", name: "Veg Burger", price: 70, veg: true, order: 9 },
+  { category: "Sandwich & Burger", name: "Veg Cheese Burger", price: 80, veg: true, order: 10 },
+  { category: "Sandwich & Burger", name: "Chicken Burger", price: 100, veg: false, order: 11 },
+  { category: "Sandwich & Burger", name: "Double Chicken Burger", price: 160, veg: false, order: 12 },
+  { category: "Sandwich & Burger", name: "Burger + Fries Combo", price: 180, veg: true, order: 13 },
+  { category: "Soups", name: "Tomato Soup", price: 150, veg: true, order: 1 },
+  { category: "Soups", name: "Sweet Corn Soup", price: 130, veg: true, order: 2 },
+  { category: "Soups", name: "Hot & Sour Soup (Veg)", price: 100, veg: true, order: 3 },
+  { category: "Soups", name: "Hot & Sour Soup (Chicken)", price: 180, veg: false, order: 4 },
+  { category: "Soups", name: "Mushroom Soup", price: 120, veg: true, order: 5 },
+  { category: "Soups", name: "Chicken Clear Soup", price: 140, veg: false, order: 6 },
+  { category: "Chinese", name: "Veg Fried Rice", price: 160, veg: true, order: 1 },
+  { category: "Chinese", name: "Egg Fried Rice", price: 180, veg: false, order: 2 },
+  { category: "Chinese", name: "Chicken Fried Rice", price: 220, veg: false, order: 3 },
+  { category: "Chinese", name: "Veg Hakka Noodles", price: 160, veg: true, order: 4 },
+  { category: "Chinese", name: "Chicken Hakka Noodles", price: 200, veg: false, order: 5 },
+  { category: "Chinese", name: "Veg Manchurian", price: 250, veg: true, order: 6 },
+  { category: "Chinese", name: "Chicken Manchurian", price: 300, veg: false, order: 7 },
+  { category: "Chinese", name: "Chilli Paneer (Dry / Gravy)", price: 200, veg: true, order: 8 },
+  { category: "Chinese", name: "Chilli Chicken", price: 260, veg: false, order: 9 },
+  { category: "Chinese", name: "Spring Rolls (Veg)", price: 160, veg: true, order: 10 },
+  { category: "Combo Meals", name: "Dal Rice Combo", price: 160, veg: true, order: 1 },
+  { category: "Combo Meals", name: "Rajma Rice Combo", price: 180, veg: true, order: 2 },
+  { category: "Combo Meals", name: "Chana Rice Combo", price: 180, veg: true, order: 3 },
+  { category: "Combo Meals", name: "Kadhi Rice Combo", price: 200, veg: true, order: 4 },
+  { category: "Combo Meals", name: "Thali", price: 200, veg: true, order: 5 },
+  { category: "Combo Meals", name: "Burger, Fries & Cold Drink", price: 200, veg: true, order: 6 },
+  { category: "Veg Main Course", name: "Dal Makhani", price: 280, veg: true, order: 1 },
+  { category: "Veg Main Course", name: "Paneer Butter Masala", price: 350, veg: true, order: 2 },
+  { category: "Veg Main Course", name: "Paneer Tikka Masala", price: 370, veg: true, order: 3 },
+  { category: "Veg Main Course", name: "Shahi Paneer", price: 380, veg: true, order: 4 },
+  { category: "Veg Main Course", name: "Palak Paneer", price: 420, veg: true, order: 5 },
+  { category: "Veg Main Course", name: "Paneer Bhurji", price: 240, veg: true, order: 6 },
+  { category: "Veg Main Course", name: "Kadai Paneer", price: 320, veg: true, order: 7 },
+  { category: "Veg Main Course", name: "Matar Mushroom", price: 190, veg: true, order: 8 },
+  { category: "Veg Main Course", name: "Kadhi Pakoda", price: 260, veg: true, order: 9 },
+  { category: "Veg Main Course", name: "Rajma", price: 200, veg: true, order: 10 },
+  { category: "Veg Main Course", name: "Chana Masala", price: 200, veg: true, order: 11 },
+  { category: "Veg Main Course", name: "Mix Vegetable Curry", price: 190, veg: true, order: 12 },
+  { category: "Veg Main Course", name: "Aloo Gobhi", price: 160, veg: true, order: 13 },
+  { category: "Rice & Breads", name: "Plain Rice", price: 120, veg: true, order: 1 },
+  { category: "Rice & Breads", name: "Jeera Rice", price: 150, veg: true, order: 2 },
+  { category: "Rice & Breads", name: "Veg Pulao", price: 200, veg: true, order: 3 },
+  { category: "Rice & Breads", name: "Dal Khichdi", price: 160, veg: true, order: 4 },
+  { category: "Rice & Breads", name: "Plain Roti", price: 20, veg: true, order: 5 },
+  { category: "Rice & Breads", name: "Butter Roti", price: 25, veg: true, order: 6 },
+  { category: "Rice & Breads", name: "Ghee Roti", price: 30, veg: true, order: 7 },
+  { category: "Rice & Breads", name: "Ajwain Paratha", price: 60, veg: true, order: 8 },
+  { category: "Rice & Breads", name: "Lachha Paratha", price: 60, veg: true, order: 9 },
+  { category: "Rice & Breads", name: "Aloo Paratha", price: 60, veg: true, order: 10 },
+  { category: "Rice & Breads", name: "Paneer Paratha", price: 80, veg: true, order: 11 },
+  { category: "Non-Veg Main Course", name: "Butter Chicken (Half)", price: 350, veg: false, order: 1 },
+  { category: "Non-Veg Main Course", name: "Butter Chicken (Full)", price: 650, veg: false, order: 2 },
+  { category: "Non-Veg Main Course", name: "Chicken Curry Home (Half)", price: 280, veg: false, order: 3 },
+  { category: "Non-Veg Main Course", name: "Chicken Curry Home (Full)", price: 540, veg: false, order: 4 },
+  { category: "Non-Veg Main Course", name: "Kadai Chicken (Half)", price: 320, veg: false, order: 5 },
+  { category: "Non-Veg Main Course", name: "Kadai Chicken (Full)", price: 550, veg: false, order: 6 },
+  { category: "Non-Veg Main Course", name: "Chicken Do Pyaza (Half)", price: 300, veg: false, order: 7 },
+  { category: "Non-Veg Main Course", name: "Chicken Do Pyaza (Full)", price: 580, veg: false, order: 8 },
+  { category: "Non-Veg Main Course", name: "Mutton Curry (Half)", price: 700, veg: false, order: 9 },
+  { category: "Non-Veg Main Course", name: "Egg Curry", price: 200, veg: false, order: 10 },
+  { category: "Non-Veg Main Course", name: "Fish Curry", price: 550, veg: false, order: 11 },
+  { category: "Pasta & Maggi", name: "White Sauce Pasta (Veg)", price: 180, veg: true, order: 1 },
+  { category: "Pasta & Maggi", name: "White Sauce Pasta (Chicken)", price: 220, veg: false, order: 2 },
+  { category: "Pasta & Maggi", name: "Red Sauce Pasta (Veg)", price: 180, veg: true, order: 3 },
+  { category: "Pasta & Maggi", name: "Red Sauce Pasta (Chicken)", price: 250, veg: false, order: 4 },
+  { category: "Pasta & Maggi", name: "Pink Sauce Pasta", price: 200, veg: true, order: 5 },
+  { category: "Pasta & Maggi", name: "Mac & Cheese", price: 180, veg: true, order: 6 },
+  { category: "Pasta & Maggi", name: "Plain Maggi", price: 50, veg: true, order: 7 },
+  { category: "Pasta & Maggi", name: "Veg Masala Maggi", price: 80, veg: true, order: 8 },
+  { category: "Pasta & Maggi", name: "Egg Maggi", price: 80, veg: false, order: 9 },
+  { category: "Pasta & Maggi", name: "Pahadi Maggi (Local)", price: 80, veg: true, order: 10 },
+  { category: "Pasta & Maggi", name: "Cheese Maggi", price: 100, veg: true, order: 11 },
 ];
-
-(async () => {
-  await mongoose.connect(process.env.MONGODB_URI || process.env.MONGO_URI || 'mongodb://127.0.0.1:27017/hotel_site');
-  await Promise.all([User.deleteMany({ role: 'admin' }), Hotel.deleteMany(), Room.deleteMany(), Offer.deleteMany(), Booking.deleteMany(), Settings.deleteMany(), Review.deleteMany(), FoodItem.deleteMany()]);
-
-  const email = process.env.ADMIN_EMAIL || 'admin@hotel.com';
-  const password = process.env.ADMIN_PASSWORD || 'Admin@123';
-  await User.create({ name: 'Site Admin', email, password, role: 'admin' });
-
-  // Site settings use the defaults defined in models/Settings.js (edit them later in Admin > Site settings)
-  const settings = await Settings.create({});
-
-  // Copy the sample guest reviews from settings into the Review collection (edit them in Admin > Reviews)
-  const sampleReviews = (settings.reviews || []).map((line, i) => {
-    const p = String(line).split('|').map((x) => x.trim());
-    return p.length >= 3
-      ? { name: p[0], country: p[1], text: p.slice(2).join(' | '), order: i }
-      : { name: p[0], country: '', text: p[1] || '', order: i };
-  }).filter((r) => r.name && r.text);
-  if (sampleReviews.length) await Review.insertMany(sampleReviews);
-
-  const hotel = await Hotel.create({
-    name: 'Hi Strangers Stay Manali',
-    city: 'Manali',
-    state: 'Himachal Pradesh',
-    type: 'Hostel',
-    brand: 'Hi Strangers Stay',
-    tagline: 'You come as guest, leave as a friend · Naggar near Manali',
-    description: 'Hi Strangers Stay in Naggar near Manali. Mountain views, garden, terrace, shared lounge and kitchen. We create moments — spontaneous bike rides, local explorations, peaceful mornings with chai and unreal views. You come as a guest, leave as a friend.',
-    images: IMG,
-    amenities: ['Free Wi-Fi', 'Garden', 'Terrace and balcony', 'Mountain view', 'Free private parking', 'Shared lounge', 'Shared kitchen', 'Breakfast available', 'Pets on request'],
-    rating: 4.6,
-    startingPrice: 2300,
-    featured: true,
-    address: 'Hi Strangers Stay Manali, Haripur, 175136, Himachal Pradesh, India',
-  });
-
-  // Room types follow the listing. PRICES ARE PLACEHOLDERS: set your real rates in Admin > Rooms.
-  const base = ['Mountain view', 'Private bathroom with bidet', 'Free Wi-Fi'];
-  await Room.create([
-    { hotel: hotel._id, name: 'Double Room with Mountain View', type: 'Private', description: 'Private room for two guests with a large double bed, a private bathroom and mountain views.', pricePerNight: 2300, maxGuests: 2, size: 200, bedType: '1 large double bed', images: IMG, amenities: base, totalRooms: 3 },
-    { hotel: hotel._id, name: 'Family Room with Mountain View', type: 'Private', description: 'Room for up to four guests with one double bed and two futon beds, a private bathroom and mountain views.', pricePerNight: 3200, maxGuests: 4, size: 300, bedType: '1 double bed and 2 futon beds', images: IMG, amenities: base, totalRooms: 2 },
-    { hotel: hotel._id, name: 'Quadruple Room with Mountain View', type: 'Private', description: 'Room for up to four guests with two large double beds, a private bathroom and mountain views.', pricePerNight: 3800, maxGuests: 4, size: 320, bedType: '2 large double beds', images: IMG, amenities: base, totalRooms: 2 },
-  ]);
-
-  // SAMPLE offers so the home page slider is not empty. Edit or delete them in Admin > Offers.
-  const days = (n) => new Date(Date.now() + n * 86400000);
-  await Offer.create([
-    { title: 'Stay 3 nights, save more', tag: 'Long stay', description: 'Slow down in the mountains. Book three nights or more and enter this code when you reserve.', image: U('photo-1506905925346-21bda4d32df4'), code: 'STAY3', discountPercent: 10, minNights: 3, validTill: days(120) },
-    { title: 'Weekday escape', tag: 'Mon to Thu', description: 'Quieter valley, better rates. Valid for stays that check in from Monday to Thursday.', image: U('photo-1555854877-bab0e564b8d5'), code: 'WEEKDAY', discountPercent: 8, weekdaysOnly: true, validTill: days(120) },
-    { title: 'Book direct welcome', tag: 'Direct booking', description: 'Reserve on this website and get a welcome chai on arrival.', image: U('photo-1520250497591-112f2f40a3f4'), code: 'HELLO', discountPercent: 0, validTill: days(180) },
-  ]);
-
-  await FoodItem.insertMany(foodItems);
-
-  console.log('Seeded 1 property, 3 rooms (placeholder prices), 3 sample offers, a sample food menu and default site settings');
-  console.log(`Admin login -> ${email} / ${password}`);
-  await mongoose.disconnect();
-})().catch((e) => { console.error(e); process.exit(1); });

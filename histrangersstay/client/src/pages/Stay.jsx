@@ -40,6 +40,7 @@ export default function Stay() {
   const [busy, setBusy] = useState(false);
   const [formError, setFormError] = useState('');
   const [done, setDone] = useState(null);
+  const [foodPrompt, setFoodPrompt] = useState(false);   // "please add your food" popup
 
   useEffect(() => { if (rooms.length && !rooms.find((r) => r._id === roomId)) setRoomId(rooms[0]._id); }, [rooms, roomId]);
   useEffect(() => {
@@ -95,8 +96,8 @@ export default function Stay() {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [roomId, checkIn, checkOut]);
 
-  const submit = async (e) => {
-    e.preventDefault();
+  // Actually creates the booking (called directly, or after the guest picks "No thanks" in the food popup)
+  const placeBooking = async () => {
     setFormError('');
     if (!room) return setFormError('Please choose a room');
     if (nights < 1) return setFormError('Check-out must be after check-in');
@@ -116,6 +117,22 @@ export default function Stay() {
       setBusy(false);
     }
   };
+
+  const submit = (e) => {
+    e.preventDefault();
+    setFormError('');
+    if (!room) return setFormError('Please choose a room');
+    if (nights < 1) return setFormError('Check-out must be after check-in');
+    // No food chosen: ask once before booking
+    if (foodLines.length === 0 && menu.length > 0) { setFoodPrompt(true); return; }
+    placeBooking();
+  };
+
+  const goToMenu = () => {
+    setFoodPrompt(false);
+    setTimeout(() => document.getElementById('menu')?.scrollIntoView({ behavior: 'smooth', block: 'start' }), 80);
+  };
+  const skipFood = () => { setFoodPrompt(false); placeBooking(); };
 
   if (loading) return <div className="wrap pb-32 pt-48 text-center text-ink/78">Loading…</div>;
   if (!hotel) return (
@@ -199,7 +216,7 @@ export default function Stay() {
               <h2 className="mb-2 mt-3 text-4xl md:text-5xl">Add food to your stay</h2>
               <p className="mb-8 max-w-2xl text-ink/78">Order meals along with your room. Items you add here are booked together with your stay and shown in your invoice.</p>
             </Reveal>
-            <FoodMenu items={menu} qty={cart} onQty={setQty} canOrder={!!user} />
+            <FoodMenu items={menu} qty={cart} onQty={setQty} canOrder />
             {foodCount > 0 && (
               <p className="mt-6 flex items-center gap-2 rounded-2xl bg-gold-50 px-5 py-3 text-sm text-ink/85"><Utensils size={16} className="text-gold-700" />{foodCount} {foodCount === 1 ? 'item' : 'items'} added, {inr(foodTotal)}. See your total in the booking form.</p>
             )}
@@ -289,8 +306,11 @@ export default function Stay() {
                     <a href="#menu" className="mt-1 flex items-center justify-center gap-2 pt-1 text-xs font-medium text-gold-700 hover:underline"><Utensils size={13} />{foodCount ? 'Change food order' : 'Add food from the menu'}</a>
                   </div>
                 ) : (
-                  <div className="text-center">
-                    <p className="text-ink/80">Prices are visible after you register or log in.</p>
+                  <div className="space-y-2">
+                    {foodLines.map((l) => <div key={l._id} className="flex justify-between text-ink/85"><span className="pr-3">{l.name} × {l.qty}</span><span>{inr(l.total)}</span></div>)}
+                    {foodLines.length > 0 && <div className="flex justify-between border-t border-ink/10 pt-2 font-medium"><span>Food total (before tax)</span><span>{inr(foodTotal)}</span></div>}
+                    <a href="#menu" className="flex items-center justify-center gap-2 pt-1 text-xs font-medium text-gold-700 hover:underline"><Utensils size={13} />{foodCount ? 'Change food order' : 'Add food from the menu'}</a>
+                    <p className="pt-2 text-center text-ink/80">Room price and final total are visible after you register or log in.</p>
                     <div className="mt-3 flex justify-center gap-2">
                       <Link className="bt-gold bt-sm" to="/register" state={{ from: '/stay' }}>Register</Link>
                       <Link className="bt-line bt-sm" to="/login" state={{ from: '/stay' }}>Log in</Link>
@@ -306,6 +326,19 @@ export default function Stay() {
           </form>
         </aside>
       </div>
+      {foodPrompt && (
+        <div className="fixed inset-0 z-[90] flex items-center justify-center bg-ink/50 p-5 backdrop-blur-sm" role="dialog" aria-modal="true" aria-label="Add food to your booking" onClick={goToMenu}>
+          <div className="surface animate-pop w-full max-w-md p-8 text-center" onClick={(e) => e.stopPropagation()}>
+            <span className="mx-auto grid h-14 w-14 place-items-center rounded-full bg-white/50 border border-white/70 text-gold-700"><Utensils size={26} /></span>
+            <h3 className="mt-4 text-3xl">Please add your food</h3>
+            <p className="mt-2 text-sm text-ink/75">You have not added any food yet. Choose your meals now and they will be added to your bill.</p>
+            <div className="mt-6 flex flex-col gap-3 sm:flex-row sm:justify-center">
+              <button type="button" className="bt-gold" onClick={goToMenu}>Add food</button>
+              <button type="button" className="bt-line" onClick={skipFood} disabled={busy}>{busy ? 'Reserving…' : 'No thanks'}</button>
+            </div>
+          </div>
+        </div>
+      )}
       <CustomBlocks page="stay" />
     </>
   );

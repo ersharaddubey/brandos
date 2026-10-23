@@ -39,7 +39,7 @@ export default function Invoice() {
 
   useEffect(() => {
     if (!user) return;
-    api.get(`/bookings/mine/${id}`).then((r) => setB(r.data)).catch((e) => setError(errMsg(e)));
+    api.get(user.role === 'admin' ? `/billing/booking/${id}` : `/bookings/mine/${id}`).then((r) => setB(r.data)).catch((e) => setError(errMsg(e)));
   }, [id, user]);
 
   if (!ready) return <div style={{ padding: 40, textAlign: 'center' }}>Loading…</div>;

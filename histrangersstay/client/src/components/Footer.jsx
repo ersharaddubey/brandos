@@ -59,6 +59,11 @@ export default function Footer() {
           <Link className={lk} to="/nearby">Around the stay</Link>
           <Link className={lk} to="/faq">FAQ and house rules</Link>
           <Link className={lk} to="/booking">Find my booking</Link>
+          <Link className={lk} to="/checkin">Web check-in</Link>
+          <Link className={lk} to="/cafe">Hi Strangers Cafe</Link>
+          <Link className={lk} to="/locations">Our locations</Link>
+          <Link className={lk} to="/leadership">Leadership and contact</Link>
+          <Link className={lk} to="/volunteer">Volunteer and collaborate</Link>
         </div>
 
         <div>

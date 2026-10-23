@@ -12,6 +12,8 @@ const LINKS = [
   ['/events', 'Events', false, true],
   ['/offers', 'Offers'],
   ['/reviews', 'Reviews'],
+  ['/cafe', 'Cafe'],
+  ['/locations', 'Locations', false, true],
   ['/contact', 'Contact'],
 ];
 
@@ -175,6 +177,9 @@ export default function Navbar() {
 
             {user && <NavLink to="/account" className={({ isActive }) => `border-b border-white/10 py-4 font-serif text-3xl ${isActive ? 'text-gold-400' : ''}`}>My account</NavLink>}
             <NavLink to="/booking" className="border-b border-white/10 py-4 font-serif text-3xl">Find booking</NavLink>
+            <NavLink to="/checkin" className="border-b border-white/10 py-4 font-serif text-3xl">Web check-in</NavLink>
+            <NavLink to="/leadership" className="border-b border-white/10 py-4 font-serif text-3xl">Leadership</NavLink>
+            <NavLink to="/volunteer" className="border-b border-white/10 py-4 font-serif text-3xl">Volunteer</NavLink>
           </nav>
           <div className="mt-8 grid gap-3">
             <Link to="/stay#book" className="bt-gold">Book your stay</Link>

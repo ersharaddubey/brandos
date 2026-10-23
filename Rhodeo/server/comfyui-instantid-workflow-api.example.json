@@ -1,0 +1,14 @@
+{
+  "1": { "inputs": { "ckpt_name": "REPLACE_WITH_INSTALLED_SDXL_CHECKPOINT.safetensors" }, "class_type": "CheckpointLoaderSimple", "_meta": { "title": "Load SDXL Checkpoint" } },
+  "2": { "inputs": { "text": "cinematic portrait, natural skin texture, detailed face, high quality", "clip": ["1", 1] }, "class_type": "CLIPTextEncode", "_meta": { "title": "Positive Prompt" } },
+  "3": { "inputs": { "text": "low quality, blurry, distorted anatomy, duplicate face, watermark, text", "clip": ["1", 1] }, "class_type": "CLIPTextEncode", "_meta": { "title": "Negative Prompt" } },
+  "4": { "inputs": { "seed": 123456789, "steps": 30, "cfg": 4.5, "sampler_name": "ddpm", "scheduler": "karras", "denoise": 1, "model": ["12", 0], "positive": ["12", 1], "negative": ["12", 2], "latent_image": ["5", 0] }, "class_type": "KSampler", "_meta": { "title": "Sample with InstantID" } },
+  "5": { "inputs": { "width": 1016, "height": 1016, "batch_size": 1 }, "class_type": "EmptyLatentImage", "_meta": { "title": "Image Size" } },
+  "6": { "inputs": { "samples": ["4", 0], "vae": ["1", 2] }, "class_type": "VAEDecode", "_meta": { "title": "Decode Image" } },
+  "7": { "inputs": { "filename_prefix": "CreativeIdentity_InstantID", "images": ["6", 0] }, "class_type": "SaveImage", "_meta": { "title": "Save Output" } },
+  "8": { "inputs": { "instantid_file": "ip-adapter.bin" }, "class_type": "InstantIDModelLoader", "_meta": { "title": "Load InstantID Model" } },
+  "9": { "inputs": { "provider": "CPU" }, "class_type": "InstantIDFaceAnalysis", "_meta": { "title": "InstantID Face Analysis" } },
+  "10": { "inputs": { "control_net_name": "instantid/diffusion_pytorch_model.safetensors" }, "class_type": "ControlNetLoader", "_meta": { "title": "Load InstantID ControlNet" } },
+  "11": { "inputs": { "image": "REPLACED_BY_CREATIVE_IDENTITY_UPLOAD.png" }, "class_type": "LoadImage", "_meta": { "title": "Identity Reference Face" } },
+  "12": { "inputs": { "instantid": ["8", 0], "insightface": ["9", 0], "control_net": ["10", 0], "image": ["11", 0], "model": ["1", 0], "positive": ["2", 0], "negative": ["3", 0], "weight": 0.8, "start_at": 0, "end_at": 1 }, "class_type": "ApplyInstantID", "_meta": { "title": "Apply Face Identity" } }
+}

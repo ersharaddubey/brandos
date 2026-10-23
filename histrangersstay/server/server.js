@@ -141,6 +141,12 @@ app.use('/api/upload', require('./routes/upload'));
 app.use('/api/settings', require('./routes/settings'));
 app.use('/api/gallery', require('./routes/gallery'));
 app.use('/api/reviews', require('./routes/reviews'));
+app.use('/api/locations', require('./routes/locations'));
+app.use('/api/team', require('./routes/team'));
+app.use('/api/checkin', require('./routes/checkin'));
+app.use('/api/cafe', require('./routes/cafe'));
+app.use('/api/volunteers', require('./routes/volunteers'));
+app.use('/api/billing', require('./routes/billing'));
 
 // Root endpoint.
 app.get('/', (req, res) => {
@@ -186,7 +192,7 @@ app.use((err, req, res, next) => {
 // Vercel imports the Express app as a function.
 // Local development starts a normal HTTP server.
 if (!process.env.VERCEL) {
-  const PORT = process.env.PORT || 5001;
+  const PORT = process.env.PORT || 5003;
 
   ensureDB()
     .then(() => {

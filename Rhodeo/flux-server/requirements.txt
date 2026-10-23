@@ -1,0 +1,14 @@
+fastapi
+uvicorn
+diffusers>=0.34.0
+transformers
+accelerate
+torch
+sentencepiece
+protobuf
+pillow
+numpy
+# optional - face similarity check (/face-similarity)
+insightface
+onnxruntime
+opencv-python-headless
