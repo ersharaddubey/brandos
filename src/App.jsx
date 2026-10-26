@@ -583,7 +583,7 @@ function Invest() {
           </ul>
         </div>
         <p style={{ marginTop: 16, color: 'var(--muted)', fontSize: '0.9rem' }}>
-          Contact: <a href="mailto:ersharaddubey@rgmail.com">ersharaddubey@rgmail.com</a>. Product access is admin-only; there
+          Contact: <a href="mailto:ersharaddubey@gmail.com">ersharaddubey@gmail.com</a>. Product access is admin-only; there
           is no public self-registration.
         </p>
       </div>
