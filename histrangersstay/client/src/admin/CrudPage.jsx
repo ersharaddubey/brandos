@@ -9,7 +9,7 @@ const Wrap = ({ as: Tag, ...rest }) => <Tag {...rest} />;
   fields: { name, label, type: text|textarea|number|select|checkbox|date|list|images|ref, options, refEndpoint, refLabel, required, hint }
   columns: { label, render(row) }
 */
-export default function CrudPage({ title, singular, endpoint, fields, columns, defaults = {}, fixed = {}, single = false, canDelete = true, note = null, onChange = null, sub = false }) {
+export default function CrudPage({ title, singular, endpoint, fields, columns, defaults = {}, fixed = {}, single = false, canDelete = true, note = null, onChange = null, sub = false, rowFilter = null }) {
   const [rows, setRows] = useState([]);
   const [refs, setRefs] = useState({});
   const [loading, setLoading] = useState(true);
@@ -37,7 +37,7 @@ export default function CrudPage({ title, singular, endpoint, fields, columns, d
   const toForm = (row) => {
     const out = { ...defaults };
     fields.forEach((f) => {
-      let v = row ? row[f.name] : defaults[f.name];
+      let v = row ? (row[f.name] ?? defaults[f.name]) : defaults[f.name];
       if (f.type === 'ref') v = v && typeof v === 'object' ? v._id : v || '';
       if (f.type === 'list') v = (v || []).join(', ');
       if (f.type === 'images') v = Array.isArray(v) ? v : [];
@@ -82,6 +82,7 @@ export default function CrudPage({ title, singular, endpoint, fields, columns, d
   };
 
   const set = (k, v) => setForm((f) => ({ ...f, [k]: v }));
+  const shownRows = rowFilter ? rows.filter(rowFilter) : rows;
 
   const renderField = (f) => {
     const v = form[f.name];
@@ -92,7 +93,7 @@ export default function CrudPage({ title, singular, endpoint, fields, columns, d
       case 'checkbox': return <input type="checkbox" checked={!!v} onChange={(e) => set(f.name, e.target.checked)} />;
       case 'select': return (
         <select value={v} onChange={(e) => set(f.name, e.target.value)} required={f.required}>
-          {f.options.map((o) => <option key={o}>{o}</option>)}
+          {f.options.map((o) => (typeof o === 'object' ? <option key={o.value} value={o.value}>{o.label}</option> : <option key={o}>{o}</option>))}
         </select>
       );
       case 'ref': return (
@@ -117,13 +118,13 @@ export default function CrudPage({ title, singular, endpoint, fields, columns, d
       {note && <p className="muted" style={{ marginTop: '-.4rem' }}>{note}</p>}
       {msg && <div className={`notice ${msg.err ? 'notice--err' : 'notice--ok'}`}>{msg.text}</div>}
       <div className="card scroll">
-        {loading ? <p className="muted">Loading…</p> : rows.length === 0 ? (
-          <p className="muted">Nothing here yet. Use “Add {singular.toLowerCase()}” to create the first one.</p>
+        {loading ? <p className="muted">Loading…</p> : shownRows.length === 0 ? (
+          <p className="muted">{rows.length ? 'Nothing matches this filter.' : `Nothing here yet. Use “Add ${singular.toLowerCase()}” to create the first one.`}</p>
         ) : (
           <table className="table">
             <thead><tr>{columns.map((c) => <th key={c.label}>{c.label}</th>)}<th /></tr></thead>
             <tbody>
-              {rows.map((r) => (
+              {shownRows.map((r) => (
                 <tr key={r._id}>
                   {columns.map((c) => <td key={c.label}>{c.render(r)}</td>)}
                   <td className="actions"><button className="link" onClick={() => open(r)}>Edit</button>{canDelete && <button className="link danger" onClick={() => remove(r)}>Delete</button>}</td>

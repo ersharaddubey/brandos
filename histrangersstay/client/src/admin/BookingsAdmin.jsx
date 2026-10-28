@@ -58,6 +58,7 @@ export default function BookingsAdmin() {
                   <td>
                     {b.couponCode ? <><b>{b.couponCode}</b>{b.discount > 0 && <small className="muted"> (− {inr(b.discount)})</small>}</> : <small className="muted">No coupon</small>}
                     <br />
+                    {b.mealPlan && <><small><b>{b.mealPlan.name}</b> · {b.mealPlan.guests}G × {b.mealPlan.days}D<br /><span className="muted">Meal plan {inr(b.mealTotal)}</span></small><br /></>}
                     {(b.food || []).length ? <small>{b.food.map((l) => `${l.name} × ${l.qty}`).join(', ')}<br /><span className="muted">Food {inr(b.foodTotal)}</span></small> : <small className="muted">No food</small>}
                   </td>
                   <td>{inr(b.totalAmount)}</td>

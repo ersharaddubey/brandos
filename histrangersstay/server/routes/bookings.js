@@ -1,10 +1,11 @@
 const express = require('express');
 const Booking = require('../models/Booking');
 const Room = require('../models/Room');
+const Hotel = require('../models/Hotel');
 const Settings = require('../models/Settings');
 const { protect, adminOnly, optionalAuth } = require('../middleware/auth');
 const asyncH = require('../utils/asyncH');
-const { resolveCoupon, buildFoodLines, totals, err } = require('../utils/pricing');
+const { resolveCoupon, buildFoodLines, buildMealPlan, totals, err } = require('../utils/pricing');
 
 const router = express.Router();
 const DAY = 86400000;
@@ -20,7 +21,7 @@ const owns = (user, b) => (b.user && String(b.user) === String(user._id)) || b.g
 
 // Public (guest or logged in): create a booking, with optional coupon and food
 router.post('/', optionalAuth, asyncH(async (req, res) => {
-  const { room: roomId, checkIn, checkOut, adults = 1, children = 0, guest = {}, specialRequests, coupon, food } = req.body;
+  const { room: roomId, checkIn, checkOut, adults = 1, children = 0, guest = {}, specialRequests, coupon, food, mealPlan: mealPlanKey } = req.body;
   if (!guest.name || !guest.email || !guest.phone) {
     return res.status(400).json({ message: 'Guest name, email and phone are required' });
   }
@@ -54,9 +55,11 @@ router.post('/', optionalAuth, asyncH(async (req, res) => {
   // Coupon and food are priced on the server, so the total can never be tampered with
   const applied = await resolveCoupon(coupon, { subtotal: roomCharges, nights, checkIn: ci });
   const foodLines = await buildFoodLines(food);
+  const hotel = await Hotel.findById(room.hotel);
+  const mealPlan = buildMealPlan(hotel, mealPlanKey, { guests: Number(adults) + Number(children), nights });
   const money = totals({
     nightlyRate: room.pricePerNight, nights, discount: applied?.discount || 0,
-    food: foodLines, taxPercent: settings.taxPercent ?? 5,
+    food: foodLines, mealTotal: mealPlan?.total || 0, taxPercent: settings.taxPercent ?? 5,
   });
 
   const booking = await Booking.create({
@@ -68,6 +71,7 @@ router.post('/', optionalAuth, asyncH(async (req, res) => {
     couponTitle: applied?.offer.title || '',
     discountPercent: applied?.offer.discountPercent || 0,
     food: foodLines,
+    mealPlan,
     ...money,
     specialRequests,
   });
@@ -115,6 +119,7 @@ router.put('/mine/:id/food', protect, asyncH(async (req, res) => {
     nights: b.nights,
     discount: b.discount || 0,
     food: foodLines,
+    mealTotal: b.mealTotal || 0, // the chosen meal plan stays as booked
     taxPercent: b.taxPercent ?? settings.taxPercent ?? 5,
   });
   b.food = foodLines;

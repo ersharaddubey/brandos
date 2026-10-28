@@ -6,11 +6,13 @@ import { useAuth } from '../AuthContext';
 import { useSettings } from '../SettingsContext';
 import { useProperty } from '../PropertyContext';
 import { isoDay, paras } from '../lib/parse';
+import useAvailability from '../lib/useAvailability';
 import { waUrl } from '../config';
 import amenityIcon from '../components/amenityIcon';
 import PageHero from '../components/PageHero';
 import RoomCard from '../components/RoomCard';
 import FoodMenu from '../components/FoodMenu';
+import MealPlans from '../components/MealPlans';
 import CustomBlocks from '../components/CustomBlocks';
 import Reveal from '../components/Reveal';
 
@@ -35,19 +37,38 @@ export default function Stay() {
   const [couponBusy, setCouponBusy] = useState(false);
   const [menu, setMenu] = useState([]);
   const [cart, setCart] = useState({});                 // { foodId: qty }
+  const [mealKey, setMealKey] = useState('');            // chosen meal plan key ('' = none)
   const autoApplied = useRef(false);
   const [requests, setRequests] = useState('');
   const [busy, setBusy] = useState(false);
   const [formError, setFormError] = useState('');
   const [done, setDone] = useState(null);
   const [foodPrompt, setFoodPrompt] = useState(false);   // "please add your food" popup
+  const [showSoldOut, setShowSoldOut] = useState(false);  // also list rooms that are sold out for the chosen dates
 
-  useEffect(() => { if (rooms.length && !rooms.find((r) => r._id === roomId)) setRoomId(rooms[0]._id); }, [rooms, roomId]);
+  // Rooms still free for the chosen dates. While unknown (loading or server problem) every room stays visible.
+  const { map: avail, loading: availLoading } = useAvailability(checkIn, checkOut, hotel?._id);
+  const isFree = (r) => !avail || avail[r._id]?.available !== false;
+  const freeRooms = rooms.filter(isFree);
+  const listRooms = showSoldOut ? [...freeRooms, ...rooms.filter((r) => !isFree(r))] : freeRooms;
+  const allSoldOut = !!avail && rooms.length > 0 && freeRooms.length === 0;
+
+  // Keep a bookable room selected: if the chosen room is sold out for these dates, move to the first free one
+  useEffect(() => {
+    if (!rooms.length) return;
+    const cur = rooms.find((r) => r._id === roomId);
+    if (cur && isFree(cur)) return;
+    const next = rooms.find(isFree);
+    if (next) setRoomId(next._id);
+    else if (!cur) setRoomId(rooms[0]._id);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [rooms, roomId, avail]);
   useEffect(() => {
     if (hash === '#book' && !loading) setTimeout(() => document.getElementById('book')?.scrollIntoView({ behavior: 'smooth', block: 'start' }), 150);
   }, [hash, loading]);
 
   const room = rooms.find((r) => r._id === roomId);
+  const roomSoldOut = !!room && !isFree(room);
   const nights = useMemo(() => Math.max(0, Math.round((new Date(checkOut) - new Date(checkIn)) / 86400000)), [checkIn, checkOut]);
   const subtotal = room ? nights * room.pricePerNight : 0;
 
@@ -57,9 +78,14 @@ export default function Stay() {
   const foodCount = foodLines.reduce((t, l) => t + l.qty, 0);
   const setQty = (id, n) => setCart((c) => { const next = { ...c }; if (n <= 0) delete next[id]; else next[id] = n; return next; });
 
-  // Same formula as the server: tax is charged on (room charges - discount + food)
+  // Meal plan: price per guest per day (days = nights), same as the server
+  const guestCount = adults + children;
+  const mealOpt = (hotel?.mealPlan?.enabled !== false ? hotel?.mealPlan?.options : [])?.find((o) => o.key === mealKey);
+  const mealTotal = mealOpt ? mealOpt.price * guestCount * nights : 0;
+
+  // Same formula as the server: tax is charged on (room charges - discount + food + meal plan)
   const discount = coupon ? Math.min(coupon.discount || 0, subtotal) : 0;
-  const taxable = Math.max(0, subtotal - discount) + foodTotal;
+  const taxable = Math.max(0, subtotal - discount) + foodTotal + mealTotal;
   const taxes = Math.round(taxable * (settings.taxPercent / 100));
   const grandTotal = taxable + taxes;
 
@@ -106,10 +132,11 @@ export default function Stay() {
       const food = foodLines.map((l) => ({ item: l._id, qty: l.qty }));
       const { data } = await api.post('/bookings', {
         room: room._id, checkIn, checkOut, adults, children, guest,
-        coupon: (coupon?.code || offerCode).trim(), food, specialRequests: requests.trim(),
+        coupon: (coupon?.code || offerCode).trim(), food, mealPlan: mealKey, specialRequests: requests.trim(),
       });
       setDone(data);
       setCart({});
+      setMealKey('');
       window.scrollTo({ top: 0, behavior: 'smooth' });
     } catch (err) {
       setFormError(errMsg(err));
@@ -122,6 +149,7 @@ export default function Stay() {
     e.preventDefault();
     setFormError('');
     if (!room) return setFormError('Please choose a room');
+    if (roomSoldOut) return setFormError('This room is sold out for the chosen dates. Please pick other dates or another room.');
     if (nights < 1) return setFormError('Check-out must be after check-in');
     // No food chosen: ask once before booking
     if (foodLines.length === 0 && menu.length > 0) { setFoodPrompt(true); return; }
@@ -157,6 +185,7 @@ export default function Stay() {
             ['Check-out', `${fmtDate(done.checkOut)} (${done.nights} ${done.nights === 1 ? 'night' : 'nights'})`],
             ['Room charges', inr(done.subtotal)],
             done.discount > 0 && [`Coupon ${done.couponCode} (${done.discountPercent}% off)`, `− ${inr(done.discount)}`],
+            done.mealPlan && [`Meal plan: ${done.mealPlan.name} (${done.mealPlan.guests} × ${done.mealPlan.days} ${done.mealPlan.days === 1 ? 'day' : 'days'} × ${inr(done.mealPlan.pricePerPerson)})`, inr(done.mealPlan.total)],
             ...(done.food || []).map((l) => [`${l.name} × ${l.qty}`, inr(l.total)]),
             ['Taxes', inr(done.taxes)],
           ].filter(Boolean).map(([k, v]) => (
@@ -203,12 +232,44 @@ export default function Stay() {
 
           <div>
             <Reveal><p className="eyebrow">Rooms</p><h2 className="mb-8 mt-3 text-4xl md:text-5xl">Choose your room</h2></Reveal>
-            {rooms.length === 0 ? <p className="rounded-2xl border border-dashed border-ink/20 p-8 text-center text-ink/70">No rooms are listed yet. Add rooms in Admin → Rooms.</p> : (
+            {rooms.length > 0 && (
+              <div className="mb-7 grid grid-cols-2 items-end gap-x-4 gap-y-3 rounded-2xl bg-gold-50 px-4 py-4 text-sm sm:flex sm:flex-wrap sm:gap-x-5 sm:px-5">
+                <label><span className="lbl">Check-in</span><input className="inp !py-2" type="date" min={isoDay(0)} value={checkIn} onChange={(e) => { const v = e.target.value; setCheckIn(v); if (checkOut <= v) setCheckOut(nextDay(v)); }} /></label>
+                <label><span className="lbl">Check-out</span><input className="inp !py-2" type="date" min={checkIn} value={checkOut} onChange={(e) => setCheckOut(e.target.value)} /></label>
+                <p className="col-span-2 text-ink/80 sm:min-w-[10rem] sm:flex-1" aria-live="polite">
+                  {nights < 1 ? 'Choose valid dates to see which rooms are free.'
+                    : availLoading ? 'Checking availability…'
+                    : avail ? <><b>{freeRooms.length}</b> of {rooms.length} room {rooms.length === 1 ? 'type is' : 'types are'} available for {nights} {nights === 1 ? 'night' : 'nights'}.</>
+                    : `${nights} ${nights === 1 ? 'night' : 'nights'} selected.`}
+                </p>
+                {avail && freeRooms.length < rooms.length && (
+                  <label className="col-span-2 flex cursor-pointer items-center gap-2 text-ink/80 sm:col-span-1"><input type="checkbox" checked={showSoldOut} onChange={(e) => setShowSoldOut(e.target.checked)} />Show sold-out rooms</label>
+                )}
+              </div>
+            )}
+            {rooms.length === 0 ? <p className="rounded-2xl border border-dashed border-ink/20 p-8 text-center text-ink/70">No rooms are listed yet. Add rooms in Admin → Rooms.</p> : allSoldOut && !showSoldOut ? (
+              <div className="rounded-2xl border border-dashed border-ink/20 p-8 text-center">
+                <p className="font-serif text-3xl">Sold out for these dates</p>
+                <p className="mt-2 text-ink/75">Every room is booked from {fmtDate(checkIn)} to {fmtDate(checkOut)}. Please try other dates or call us.</p>
+                <button type="button" className="bt-line bt-sm mt-5" onClick={() => setShowSoldOut(true)}>Show the rooms anyway</button>
+              </div>
+            ) : (
               <div className="grid gap-7 md:grid-cols-2">
-                {rooms.map((r) => <RoomCard key={r._id} room={r} selected={r._id === roomId} onSelect={() => { setRoomId(r._id); document.getElementById('book')?.scrollIntoView({ behavior: 'smooth' }); }} />)}
+                {listRooms.map((r) => <RoomCard key={r._id} room={r} availability={avail?.[r._id]} selected={r._id === roomId} onSelect={() => { setRoomId(r._id); document.getElementById('book')?.scrollIntoView({ behavior: 'smooth' }); }} />)}
               </div>
             )}
           </div>
+
+          {hotel.mealPlan?.enabled !== false && (hotel.mealPlan?.options || []).length > 0 && (
+            <div id="meal-plan" className="scroll-mt-28">
+              <Reveal>
+                <p className="eyebrow">Meal plans</p>
+                <h2 className="mb-2 mt-3 text-4xl md:text-5xl">Add a meal plan</h2>
+                <p className="mb-8 max-w-2xl text-ink/78">Pick one of two daily plans for every guest and every day of your stay. It is added to your booking and shown on your invoice.</p>
+              </Reveal>
+              <MealPlans plan={hotel.mealPlan} value={mealKey} onChange={setMealKey} guests={guestCount} nights={nights} />
+            </div>
+          )}
 
           <div id="menu" className="scroll-mt-28">
             <Reveal>
@@ -262,7 +323,7 @@ export default function Stay() {
 
             {rooms.length > 1 && (
               <label className="mt-5 block"><span className="lbl">Room</span>
-                <select className="inp" value={roomId} onChange={(e) => setRoomId(e.target.value)}>{rooms.map((r) => <option key={r._id} value={r._id}>{r.name}</option>)}</select></label>
+                <select className="inp" value={roomId} onChange={(e) => setRoomId(e.target.value)}>{rooms.filter((r) => isFree(r) || showSoldOut || r._id === roomId).map((r) => <option key={r._id} value={r._id} disabled={!isFree(r)}>{r.name}{isFree(r) ? '' : ' (sold out)'}</option>)}</select></label>
             )}
             <div className="mt-4 grid grid-cols-2 gap-3">
               <label><span className="lbl">Check-in</span><input className="inp" type="date" min={isoDay(0)} value={checkIn} required onChange={(e) => { const v = e.target.value; setCheckIn(v); if (checkOut <= v) setCheckOut(nextDay(v)); }} /></label>
@@ -274,6 +335,15 @@ export default function Stay() {
               <label className="block"><span className="lbl">Full name</span><input className="inp" value={guest.name} onChange={(e) => setGuest({ ...guest, name: e.target.value })} required /></label>
               <label className="block"><span className="lbl">Email</span><input className="inp" type="email" value={guest.email} onChange={(e) => setGuest({ ...guest, email: e.target.value })} required /></label>
               <label className="block"><span className="lbl">Phone</span><input className="inp" type="tel" value={guest.phone} onChange={(e) => setGuest({ ...guest, phone: e.target.value })} required /></label>
+              {hotel.mealPlan?.enabled !== false && (hotel.mealPlan?.options || []).length > 0 && (
+                <label className="block"><span className="lbl">Meal plan (optional)</span>
+                  <select className="inp" value={mealKey} onChange={(e) => setMealKey(e.target.value)}>
+                    <option value="">No meal plan</option>
+                    {hotel.mealPlan.options.map((o) => <option key={o.key} value={o.key}>{o.name} · {inr(o.price)} per guest / day</option>)}
+                  </select>
+                  <a href="#meal-plan" className="mt-1.5 inline-block text-xs font-medium text-gold-700 hover:underline">See weekly meal menu</a>
+                </label>
+              )}
               <div>
                 <span className="lbl">Coupon code (optional)</span>
                 {coupon ? (
@@ -300,6 +370,7 @@ export default function Stay() {
                   <div className="space-y-2">
                     <div className="flex justify-between"><span>{inr(room.pricePerNight)} × {nights} {nights === 1 ? 'night' : 'nights'}</span><span>{inr(subtotal)}</span></div>
                     {discount > 0 && <div className="flex justify-between text-emerald-700"><span>Coupon {coupon.code}</span><span>− {inr(discount)}</span></div>}
+                    {mealOpt && <div className="flex justify-between text-ink/85"><span className="pr-3">{mealOpt.name}: {inr(mealOpt.price)} × {guestCount} {guestCount === 1 ? 'guest' : 'guests'} × {nights} {nights === 1 ? 'day' : 'days'}</span><span>{inr(mealTotal)}</span></div>}
                     {foodLines.map((l) => <div key={l._id} className="flex justify-between text-ink/85"><span className="pr-3">{l.name} × {l.qty}</span><span>{inr(l.total)}</span></div>)}
                     <div className="flex justify-between"><span>Taxes ({settings.taxPercent}%)</span><span>{inr(taxes)}</span></div>
                     <div className="flex justify-between border-t border-ink/10 pt-3 text-base font-semibold"><span>Total</span><span className="font-serif text-2xl">{inr(grandTotal)}</span></div>
@@ -307,6 +378,7 @@ export default function Stay() {
                   </div>
                 ) : (
                   <div className="space-y-2">
+                    {mealOpt && <div className="flex justify-between border-b border-ink/10 pb-2 font-medium"><span className="pr-3">{mealOpt.name} ({guestCount} × {nights} {nights === 1 ? 'day' : 'days'})</span><span>{inr(mealTotal)}</span></div>}
                     {foodLines.map((l) => <div key={l._id} className="flex justify-between text-ink/85"><span className="pr-3">{l.name} × {l.qty}</span><span>{inr(l.total)}</span></div>)}
                     {foodLines.length > 0 && <div className="flex justify-between border-t border-ink/10 pt-2 font-medium"><span>Food total (before tax)</span><span>{inr(foodTotal)}</span></div>}
                     <a href="#menu" className="flex items-center justify-center gap-2 pt-1 text-xs font-medium text-gold-700 hover:underline"><Utensils size={13} />{foodCount ? 'Change food order' : 'Add food from the menu'}</a>
@@ -319,8 +391,9 @@ export default function Stay() {
                 )}
               </div>
             )}
+            {roomSoldOut && <p className="mt-4 rounded-xl bg-amber-50 px-4 py-3 text-sm text-amber-800">{allSoldOut ? 'All rooms are sold out for these dates. Please choose other dates.' : 'This room is sold out for these dates. Please choose another room or other dates.'}</p>}
             {formError && <p className="mt-4 rounded-xl bg-red-50 px-4 py-3 text-sm text-red-700">{formError}</p>}
-            <button className="bt-gold mt-5 w-full" disabled={busy || !room}>{busy ? 'Reserving…' : 'Reserve now'}</button>
+            <button className="bt-gold mt-5 w-full" disabled={busy || !room || roomSoldOut}>{busy ? 'Reserving…' : roomSoldOut ? 'Sold out for these dates' : 'Reserve now'}</button>
             <p className="mt-4 text-center text-xs text-ink/68">No online payment. You pay at the property.</p>
             {user && <p className="mt-2 text-center text-xs text-ink/68">After booking, find it and your invoice in <Link className="text-gold-700 hover:underline" to="/account">My account</Link>.</p>}
           </form>

@@ -2,7 +2,10 @@ const mongoose = require('mongoose');
 
 // Guest review shown on the diary-style Reviews page and on the home page.
 // Managed in Admin > Reviews.
+// type: 'stay' = about the room / property, 'food' = about the cafe and food.
+// Older reviews have no type and are treated as 'stay'.
 const reviewSchema = new mongoose.Schema({
+  type: { type: String, enum: ['stay', 'food'], default: 'stay', index: true },
   name: { type: String, required: true, trim: true, maxlength: 80 },
   country: { type: String, default: '', trim: true, maxlength: 80 },
   text: { type: String, required: true, trim: true, maxlength: 1500 },

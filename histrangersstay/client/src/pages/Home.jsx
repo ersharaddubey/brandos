@@ -1,5 +1,7 @@
+import { useEffect, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Check, ArrowRight, MapPin, Star } from 'lucide-react';
+import api from '../api';
 import { useSettings } from '../SettingsContext';
 import { useProperty } from '../PropertyContext';
 import { parseSlides, parseGallery, parseExperiences, parseEvents, parsePairs, parseNearby, parseFaqs, paras } from '../lib/parse';
@@ -35,7 +37,16 @@ export default function Home() {
     .filter((p, i, a) => a.findIndex((x) => x.src === p.src) === i);
   const experiences = parseExperiences(s.experiences).slice(0, 4);
   const why = parsePairs(s.whyUs);
-  const { reviews } = useReviews();
+  const { reviews } = useReviews('stay');
+
+  // Menu teaser: sections of the food menu, each links to that part of the cafe menu (/cafe)
+  const [menu, setMenu] = useState([]);
+  useEffect(() => { api.get('/food').then((r) => setMenu(Array.isArray(r.data) ? r.data : [])).catch(() => {}); }, []);
+  const menuCats = useMemo(() => {
+    const m = new Map();
+    menu.forEach((i) => m.set(i.category || 'Menu', (m.get(i.category || 'Menu') || 0) + 1));
+    return [...m.entries()].map(([name, n]) => ({ name, n }));
+  }, [menu]);
   const nearby = parseNearby(s.nearby).flatMap((g) => g.items.map((n) => ({ ...n, cat: g.title }))).slice(0, 6);
   const faqs = parseFaqs(s.faqs).slice(0, 5);
   const events = parseEvents(s.events).slice(0, 3);
@@ -108,6 +119,21 @@ export default function Home() {
       )}
 
       <LongStayPricing />
+
+      {/* Cafe menu: open to everyone, with prices */}
+      {menuCats.length > 0 && (
+        <section className="wrap section-y">
+          <SectionHeading eyebrow="Hi Strangers Cafe" title="Our menu, open to everyone" text="Every dish with its price, no login needed to look. Filter veg or non-veg, search, and order from your table or add food to your stay." />
+          <Reveal className="flex flex-wrap justify-center gap-3">
+            {menuCats.map((c) => (
+              <Link key={c.name} to={`/cafe?cat=${encodeURIComponent(c.name)}`} className="glass rounded-full px-5 py-3 text-[0.95rem] transition hover:-translate-y-0.5 hover:shadow-glass-lg">
+                {c.name} <span className="ml-1 text-xs text-ink/55">{c.n}</span>
+              </Link>
+            ))}
+          </Reveal>
+          <div className="mt-10 flex flex-wrap justify-center gap-4"><Link to="/cafe" className="bt-dark">Order from the cafe</Link><Link to="/cafe?mode=stay" className="bt-line">Add food to your stay</Link></div>
+        </section>
+      )}
 
       {/* Experiences */}
       {experiences.length > 0 && (

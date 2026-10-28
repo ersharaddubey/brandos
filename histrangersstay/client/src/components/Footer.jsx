@@ -3,81 +3,80 @@ import { Phone, Mail, MapPin, Instagram, Youtube, MessageCircle, Clock } from 'l
 import { useSettings } from '../SettingsContext';
 import { igUrl, waUrl, ytUrl } from '../config';
 
-const col = 'mb-5 text-[0.72rem] font-medium uppercase tracking-[0.28em] text-gold-400';
+const col = 'mb-4 text-[0.72rem] font-medium uppercase tracking-[0.28em] text-gold-400';
 const lk = 'block py-1 text-white/80 transition hover:text-gold-300';
+const social = 'grid h-11 w-11 place-items-center rounded-full border border-white/20 transition hover:border-gold-400 hover:text-gold-300';
+
+// Footer links grouped by topic: four columns of similar length, two per row on phones
+const GROUPS = [
+  ['Stay and book', [
+    ['/stay', 'Rooms and booking'],
+    ['/offers', 'Offers'],
+    ['/booking', 'Find my booking'],
+    ['/checkin', 'Web check-in'],
+    ['/facilities', 'Facilities'],
+  ]],
+  ['Cafe and food', [
+    ['/cafe', 'Order from the cafe'],
+    ['/cafe?mode=stay', 'Add food to your stay'],
+    ['/reviews?tab=food', 'Food reviews'],
+    ['/reviews', 'Stay reviews'],
+  ]],
+  ['Discover', [
+    ['/experiences', 'Experiences'],
+    ['/events', 'Events'],
+    ['/nearby', 'Around the stay'],
+    ['/gallery', 'Photo gallery'],
+    ['/instagram-gallery', 'Instagram Gallery'],
+    ['/youtube-gallery', 'YouTube Gallery'],
+  ]],
+  ['About us', [
+    ['/about', 'Our story'],
+    ['/leadership', 'Leadership'],
+    ['/volunteer', 'Volunteer and collaborate'],
+    ['/faq', 'FAQ and house rules'],
+    ['/contact', 'Contact and locations'],
+  ]],
+];
 
 export default function Footer() {
   const { settings: s } = useSettings();
   return (
-    <footer className="band-dark pb-24 pt-20 text-[0.95rem] text-white/85 md:pb-8">
-      <div className="wrap grid gap-12 md:grid-cols-2 lg:grid-cols-[1.4fr_1fr_1fr_1.3fr]">
-        <div>
-          <Link to="/" className="inline-block">
-            <img src="/logo.jpg" alt={s.siteName} className="h-16 w-16 rounded-full object-cover shadow-lg ring-2 ring-gold-400/40" />
-          </Link>
-          <p className="mt-3 max-w-xs leading-relaxed">{s.tagline}</p>
-          <div className="mt-6 flex gap-3">
-            {s.instagram && (
-              <a href={igUrl(s.instagram)} target="_blank" rel="noreferrer" aria-label="Instagram" className="grid h-11 w-11 place-items-center rounded-full border border-white/20 transition hover:border-gold-400 hover:text-gold-300">
-                <Instagram size={18} />
-              </a>
-            )}
-            {s.youtube && (
-              <a href={ytUrl(s.youtube)} target="_blank" rel="noreferrer" aria-label="YouTube" className="grid h-11 w-11 place-items-center rounded-full border border-white/20 transition hover:border-gold-400 hover:text-gold-300">
-                <Youtube size={18} />
-              </a>
-            )}
-            {s.whatsapp && (
-              <a href={waUrl(s.whatsapp)} target="_blank" rel="noreferrer" aria-label="WhatsApp" className="grid h-11 w-11 place-items-center rounded-full border border-white/20 transition hover:border-gold-400 hover:text-gold-300">
-                <MessageCircle size={18} />
-              </a>
-            )}
-            {s.phone && (
-              <a href={`tel:${s.phone}`} aria-label="Call" className="grid h-11 w-11 place-items-center rounded-full border border-white/20 transition hover:border-gold-400 hover:text-gold-300">
-                <Phone size={18} />
-              </a>
-            )}
+    <footer className="band-dark pb-24 pt-14 text-[0.95rem] text-white/85 md:pb-8 md:pt-20">
+      <div className="wrap">
+        <div className="grid grid-cols-2 gap-x-6 gap-y-9 lg:grid-cols-4 lg:gap-x-10">
+          {GROUPS.map(([title, links]) => (
+            <div key={title}>
+              <h4 className={col}>{title}</h4>
+              {links.map(([to, label]) => <Link key={to} className={lk} to={to}>{label}</Link>)}
+            </div>
+          ))}
+        </div>
+
+        <div className="mt-12 grid gap-8 border-t border-white/10 pt-10 lg:grid-cols-[1fr_1.6fr] lg:items-start lg:gap-14">
+          <div>
+            <Link to="/" className="inline-block">
+              <img src="/logo.jpg" alt={s.siteName} className="h-14 w-14 rounded-full object-cover shadow-lg ring-2 ring-gold-400/40 sm:h-16 sm:w-16" />
+            </Link>
+            <p className="mt-3 max-w-sm leading-relaxed">{s.tagline}</p>
+            <div className="mt-5 flex gap-3">
+              {s.instagram && <a href={igUrl(s.instagram)} target="_blank" rel="noreferrer" aria-label="Instagram" className={social}><Instagram size={18} /></a>}
+              {s.youtube && <a href={ytUrl(s.youtube)} target="_blank" rel="noreferrer" aria-label="YouTube" className={social}><Youtube size={18} /></a>}
+              {s.whatsapp && <a href={waUrl(s.whatsapp)} target="_blank" rel="noreferrer" aria-label="WhatsApp" className={social}><MessageCircle size={18} /></a>}
+              {s.phone && <a href={`tel:${s.phone}`} aria-label="Call" className={social}><Phone size={18} /></a>}
+            </div>
           </div>
-        </div>
 
-        <div>
-          <h4 className={col}>Explore</h4>
-          <Link className={lk} to="/stay">Rooms and booking</Link>
-          <Link className={lk} to="/experiences">Experiences</Link>
-          <Link className={lk} to="/events">Events</Link>
-          <Link className={lk} to="/gallery">Gallery</Link>
-          <Link className={lk} to="/instagram-gallery">Instagram Gallery</Link>
-          <Link className={lk} to="/youtube-gallery">YouTube Gallery</Link>
-          <Link className={lk} to="/offers">Offers</Link>
-          <Link className={lk} to="/reviews">Guest reviews</Link>
-        </div>
-
-        <div>
-          <h4 className={col}>Plan your trip</h4>
-          <Link className={lk} to="/about">About us</Link>
-          <Link className={lk} to="/facilities">Facilities</Link>
-          <Link className={lk} to="/nearby">Around the stay</Link>
-          <Link className={lk} to="/faq">FAQ and house rules</Link>
-          <Link className={lk} to="/booking">Find my booking</Link>
-          <Link className={lk} to="/checkin">Web check-in</Link>
-          <Link className={lk} to="/cafe">Hi Strangers Cafe</Link>
-          <Link className={lk} to="/locations">Our locations</Link>
-          <Link className={lk} to="/leadership">Leadership and contact</Link>
-          <Link className={lk} to="/volunteer">Volunteer and collaborate</Link>
-        </div>
-
-        <div>
-          <h4 className={col}>Get in touch</h4>
-          <ul className="space-y-3">
-            {s.address && <li className="flex gap-3"><MapPin size={17} className="mt-1 shrink-0 text-gold-400" /><span>{s.address}</span></li>}
+          <ul className="grid gap-x-8 gap-y-4 sm:grid-cols-2">
+            {s.address && <li className="flex gap-3 sm:col-span-2"><MapPin size={17} className="mt-1 shrink-0 text-gold-400" /><span>{s.address}</span></li>}
             {s.phone && <li className="flex gap-3"><Phone size={17} className="mt-1 shrink-0 text-gold-400" /><a href={`tel:${s.phone}`} className="hover:text-gold-300">{s.phone}</a></li>}
-            {s.email && <li className="flex gap-3"><Mail size={17} className="mt-1 shrink-0 text-gold-400" /><a href={`mailto:${s.email}`} className="hover:text-gold-300">{s.email}</a></li>}
+            {s.email && <li className="flex min-w-0 gap-3"><Mail size={17} className="mt-1 shrink-0 text-gold-400" /><a href={`mailto:${s.email}`} className="break-all hover:text-gold-300">{s.email}</a></li>}
             {s.checkInTime && <li className="flex gap-3"><Clock size={17} className="mt-1 shrink-0 text-gold-400" /><span>Check-in {s.checkInTime}<br />Check-out {s.checkOutTime}</span></li>}
           </ul>
         </div>
       </div>
 
-      <div className="wrap mt-16 flex flex-wrap items-center justify-between gap-3 border-t border-white/10 pt-6 text-sm text-white/45">
+      <div className="wrap mt-10 flex flex-wrap items-center justify-between gap-3 border-t border-white/10 pt-6 text-sm text-white/45">
         <p>© {new Date().getFullYear()} {s.siteName}. All rights reserved.</p>
         <Link to="/admin" className="hover:text-white/80">Admin</Link>
       </div>

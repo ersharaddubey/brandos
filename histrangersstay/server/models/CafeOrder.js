@@ -25,6 +25,9 @@ const cafeOrderSchema = new mongoose.Schema({
   total: { type: Number, default: 0 },
   status: { type: String, enum: ['placed', 'preparing', 'served', 'paid', 'cancelled'], default: 'placed' },
   paymentMode: { type: String, default: '' },
+  // 'qr' = guest scanned the table QR code, 'web' = ordered from the website. guest = ordered without an account.
+  source: { type: String, enum: ['web', 'qr'], default: 'web' },
+  guest: { type: Boolean, default: false },
 }, { timestamps: true });
 
 cafeOrderSchema.pre('validate', function (next) {

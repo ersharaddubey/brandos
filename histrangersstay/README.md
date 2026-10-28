@@ -131,3 +131,46 @@ Keep `server/.env` out of Git and never commit Cloudinary API secrets. If creden
 * Bill formula: `total = room charges - coupon discount + food + tax`, where tax % (Admin -> Site settings) is charged on (room - discount + food)
 
 New API: `GET /api/food`, `POST /api/offers/validate`, `GET /api/bookings/mine`, `GET /api/bookings/mine/:id`, `PUT /api/bookings/mine/:id/food`, `PATCH /api/bookings/mine/:id/cancel`, `PUT /api/auth/me`.
+
+
+## Cafe, menu, reviews and room availability update
+
+**Cafe page (`/cafe`) has two options at the top**
+
+* **Order from the cafe**: dine in, takeaway or to your room. Prices and details are visible to everyone, no login needed to look
+* **Add food to your stay** (`/cafe?mode=stay`): pick dishes from the same menu, choose your booking and tap "Save to my booking". The food is added to that booking (earlier dishes are kept) and the guest is taken to **My account**, not to the Stay page. Asks to log in first if needed
+* There is no separate Menu page any more. Old `/menu` links open `/cafe`. The home page menu section links into the cafe page
+
+**Header and footer**
+
+* Header: Home, Stay, Cafe, **Explore** (Experiences, Events, Offers, Reviews), **Social** (Instagram, YouTube, Gallery), Contact. On phones the same groups open as accordions
+* Footer links are grouped: Stay and book, Cafe and food, Discover, About us. Address, phone and email sit in one row under them
+* **Locations** now live inside the Contact page (`/contact#locations`). Old `/locations` links redirect there. Manage them in Admin -> Locations as before
+
+**Menu search, filter and headings** (same component on `/cafe`, `/stay#menu` and My account):
+
+* Search box at the top (matches dish name, description and section)
+* Veg / Non-veg / All filter with counts
+* Big heading for every menu section, plus a sticky bar to jump between sections
+
+**Guest login through QR (`/cafe`)**
+
+* Admin -> **Cafe QR codes** makes a printable QR for each table (and one for the counter). A code opens `/cafe?table=5&qr=1`
+* The guest sees the menu straight away. To order they tap **Continue as guest** (name + phone, no password) or log in. The guest session lasts 12 hours on that phone
+* The table is filled in automatically, and the guest can open their bill again from "Your recent orders"
+* Admin -> Cafe orders marks orders that came from a QR scan or a guest
+
+**Separate reviews for Stay and Food**
+
+* Admin -> Reviews: every review has "Review is about: Stay / Food and cafe". Old reviews count as Stay. Filter tabs: All, Stay, Food, Waiting for approval
+* `/reviews` has two tabs (Stay reviews, Food & cafe reviews, also `/reviews?tab=food`). The home page shows stay reviews only. Food reviews also appear at the bottom of `/cafe`
+* Guests can write a review from the Reviews page. It arrives hidden: switch on "Show on website" to publish it
+
+**Rooms hide / show by availability (`/stay`)**
+
+* The Stay page checks the chosen dates (`GET /api/rooms/availability?checkIn=&checkOut=`, same rule as booking: pending + confirmed bookings against "Rooms of this type available")
+* Sold-out rooms are hidden. "Show sold-out rooms" lists them greyed out. Rooms with 3 or fewer left show "Only N left"
+* A sold-out room cannot be selected or reserved. Check-in / check-out dates can be changed right above the rooms
+* To close a room type completely, untick "Available for booking" in Admin -> Rooms as before
+
+After updating: `npm run install:all` (adds the `qrcode` package to the client). No database migration is needed.

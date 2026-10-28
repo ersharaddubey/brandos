@@ -39,7 +39,7 @@ export default function CafeOrdersAdmin() {
                 <Fragment key={o._id}>
                   <tr>
                     <td><b>{o.orderNo}</b><br /><small className="muted">{new Date(o.createdAt).toLocaleString('en-IN')}</small></td>
-                    <td>{o.customer.name}<br /><small className="muted">{o.customer.phone} · {o.orderType}{o.place ? ` ${o.place}` : ''}</small></td>
+                    <td>{o.customer.name}<br /><small className="muted">{o.customer.phone} · {o.orderType}{o.place ? ` ${o.place}` : ''}</small>{(o.source === 'qr' || o.guest) && <><br /><small className="muted">{[o.source === 'qr' && 'QR scan', o.guest && 'guest'].filter(Boolean).join(' · ')}</small></>}</td>
                     <td><small>{o.items.map((l) => `${l.name} × ${l.qty}`).join(', ')}{o.note ? ` (Note: ${o.note})` : ''}</small></td>
                     <td>{inr(o.total)}</td>
                     <td><select value={o.status} onChange={(e) => patch(o, { status: e.target.value })}>{STATUSES.map((s) => <option key={s}>{s}</option>)}</select> <span className={`badge badge--${BADGE[o.status]}`}>{o.status}</span></td>

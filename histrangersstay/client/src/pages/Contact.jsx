@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { useLocation } from 'react-router-dom';
 import { MapPin, Phone, Mail, MessageCircle, Instagram, Send, Navigation, ExternalLink, Clock, Sparkles } from 'lucide-react';
 import { useSettings } from '../SettingsContext';
 import { igUrl, waUrl, mapEmbed, directionsUrl, PLACE } from '../config';
@@ -8,9 +9,17 @@ import SectionHeading from '../components/SectionHeading';
 import Reveal from '../components/Reveal';
 import CustomBlocks from '../components/CustomBlocks';
 import CtaBand from '../components/CtaBand';
+import LocationCards from '../components/LocationCards';
 
 export default function Contact() {
   const { settings: s } = useSettings();
+  const { hash } = useLocation();
+  const [hasPlaces, setHasPlaces] = useState(false);
+  // /contact#locations: scroll to the locations once they have loaded (the page grows while they load)
+  const onPlaces = (rows) => {
+    setHasPlaces(rows.length > 0);
+    if (hash === '#locations' && rows.length) setTimeout(() => document.getElementById('locations')?.scrollIntoView({ behavior: 'smooth', block: 'start' }), 120);
+  };
   const [f, setF] = useState({ name: '', checkIn: isoDay(1), guests: 2, message: '' });
   const [sent, setSent] = useState(false);
   const set = (k) => (e) => setF({ ...f, [k]: e.target.value });
@@ -72,7 +81,7 @@ export default function Contact() {
       </section>
 
       {/* Main: Address + Form */}
-      <section className="wrap section-y pt-12 md:pt-16">
+      <section id="enquiry" className="wrap section-y scroll-mt-28 pt-12 md:pt-16">
         <div className="grid items-start gap-10 lg:grid-cols-[1fr_1.15fr] lg:gap-14">
           {/* Left column */}
           <div className="space-y-6">
@@ -190,6 +199,14 @@ export default function Contact() {
             </div>
           </Reveal>
         </div>
+      </section>
+
+      {/* Our locations (managed in Admin > Locations; the section hides itself when there are none) */}
+      <section id="locations" className={`wrap scroll-mt-28 ${hasPlaces ? 'pb-16 md:pb-24' : ''}`}>
+        {hasPlaces && (
+          <SectionHeading eyebrow="Locations" title="Find a Hi Strangers near you" text="Manali is open today. Kasol, Bir and more homes are on the way." />
+        )}
+        <LocationCards onLoaded={onPlaces} />
       </section>
 
       {/* Map + how to reach */}

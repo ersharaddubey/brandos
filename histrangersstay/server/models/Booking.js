@@ -10,6 +10,16 @@ const foodLineSchema = new mongoose.Schema({
   total: Number,
 }, { _id: false });
 
+const mealPlanLineSchema = new mongoose.Schema({
+  key: String,
+  name: String,
+  includes: [String],
+  pricePerPerson: Number, // per guest per day
+  guests: Number,
+  days: Number,
+  total: Number,
+}, { _id: false });
+
 const bookingSchema = new mongoose.Schema({
   reference: { type: String, unique: true, index: true },
   invoiceNo: String,
@@ -28,7 +38,7 @@ const bookingSchema = new mongoose.Schema({
   adults: { type: Number, default: 1 },
   children: { type: Number, default: 0 },
   // Money. subtotal = room charges before discount.
-  // totalAmount = subtotal - discount + foodTotal + taxes
+  // totalAmount = subtotal - discount + foodTotal + mealTotal + taxes
   subtotal: Number,
   couponCode: { type: String, default: '' },
   couponTitle: { type: String, default: '' },
@@ -36,6 +46,8 @@ const bookingSchema = new mongoose.Schema({
   discount: { type: Number, default: 0 },
   food: { type: [foodLineSchema], default: [] },
   foodTotal: { type: Number, default: 0 },
+  mealPlan: { type: mealPlanLineSchema, default: null },
+  mealTotal: { type: Number, default: 0 },
   taxPercent: Number,
   taxes: Number,
   totalAmount: Number,

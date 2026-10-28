@@ -29,7 +29,6 @@ import Invoice from './pages/Invoice';
 import Cafe from './pages/Cafe';
 import CafeBill from './pages/CafeBill';
 import CheckIn from './pages/CheckIn';
-import Locations from './pages/Locations';
 import Leadership from './pages/Leadership';
 import Volunteer from './pages/Volunteer';
 
@@ -46,6 +45,7 @@ const VideosAdmin = lazy(() => import('./admin/VideosAdmin'));
 const ReviewsAdmin = lazy(() => import('./admin/ReviewsAdmin'));
 const FoodAdmin = lazy(() => import('./admin/FoodAdmin'));
 const CafeOrdersAdmin = lazy(() => import('./admin/CafeOrdersAdmin'));
+const CafeQrAdmin = lazy(() => import('./admin/CafeQrAdmin'));
 const BillingAdmin = lazy(() => import('./admin/BillingAdmin'));
 const CheckInsAdmin = lazy(() => import('./admin/CheckInsAdmin'));
 const VolunteersAdmin = lazy(() => import('./admin/VolunteersAdmin'));
@@ -59,6 +59,12 @@ function ScrollTop() {
     window.scrollTo(0, 0);
   }, [pathname, hash]);
   return null;
+}
+
+// Old /menu links open the cafe page, keeping things like ?cat=Breakfast
+function RedirectKeepQuery({ to }) {
+  const { search } = useLocation();
+  return <Navigate to={`${to}${search}`} replace />;
 }
 
 function PublicLayout() {
@@ -111,9 +117,11 @@ export default function App() {
             <Route path="/login" element={<Login />} />
             <Route path="/register" element={<Register />} />
             <Route path="/account" element={<Account />} />
+            {/* The menu now lives inside the Cafe page, and locations inside Contact */}
+            <Route path="/menu" element={<RedirectKeepQuery to="/cafe" />} />
             <Route path="/cafe" element={<Cafe />} />
             <Route path="/checkin" element={<CheckIn />} />
-            <Route path="/locations" element={<Locations />} />
+            <Route path="/locations" element={<Navigate to="/contact#locations" replace />} />
             <Route path="/leadership" element={<Leadership />} />
             <Route path="/volunteer" element={<Volunteer />} />
             {/* Old multi-hotel links now point to the single property */}
@@ -136,6 +144,7 @@ export default function App() {
             <Route path="offers" element={<OffersAdmin />} />
             <Route path="food" element={<FoodAdmin />} />
             <Route path="cafe" element={<CafeOrdersAdmin />} />
+            <Route path="cafe-qr" element={<CafeQrAdmin />} />
             <Route path="billing" element={<BillingAdmin />} />
             <Route path="checkins" element={<CheckInsAdmin />} />
             <Route path="volunteers" element={<VolunteersAdmin />} />

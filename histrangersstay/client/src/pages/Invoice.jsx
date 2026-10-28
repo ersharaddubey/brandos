@@ -109,6 +109,7 @@ export default function Invoice() {
           <thead><tr><th>Description</th><th className="r">Qty</th><th className="r">Rate</th><th className="r">Amount</th></tr></thead>
           <tbody>
             <tr><td>Room: {b.room?.name}<br /><span style={{ color: '#6b6254' }}>{fmtDate(b.checkIn)} to {fmtDate(b.checkOut)}</span></td><td className="r">{b.nights} {b.nights === 1 ? 'night' : 'nights'}</td><td className="r">{inr(rate)}</td><td className="r">{inr(b.subtotal)}</td></tr>
+            {b.mealPlan && <tr><td>Meal plan: {b.mealPlan.name}<br /><span style={{ color: '#6b6254' }}>{(b.mealPlan.includes || []).join(', ')} · {b.mealPlan.guests} {b.mealPlan.guests === 1 ? 'guest' : 'guests'} × {b.mealPlan.days} {b.mealPlan.days === 1 ? 'day' : 'days'}</span></td><td className="r">{b.mealPlan.guests * b.mealPlan.days}</td><td className="r">{inr(b.mealPlan.pricePerPerson)}</td><td className="r">{inr(b.mealPlan.total)}</td></tr>}
             {(b.food || []).map((l) => (
               <tr key={`${l.item}-${l.name}`}><td>Food: {l.name}</td><td className="r">{l.qty}</td><td className="r">{inr(l.price)}</td><td className="r">{inr(l.total)}</td></tr>
             ))}
@@ -119,6 +120,7 @@ export default function Invoice() {
           <tbody>
             <tr className="tot"><td className="r" style={{ width: '70%' }}>Room charges</td><td className="r">{inr(b.subtotal)}</td></tr>
             {b.discount > 0 && <tr className="tot"><td className="r">Discount (coupon {b.couponCode}{b.discountPercent ? `, ${b.discountPercent}%` : ''})</td><td className="r">− {inr(b.discount)}</td></tr>}
+            {b.mealTotal > 0 && <tr className="tot"><td className="r">Meal plan</td><td className="r">{inr(b.mealTotal)}</td></tr>}
             {b.foodTotal > 0 && <tr className="tot"><td className="r">Food</td><td className="r">{inr(b.foodTotal)}</td></tr>}
             <tr className="tot"><td className="r">Taxes ({taxPercent}%)</td><td className="r">{inr(b.taxes)}</td></tr>
             <tr className="tot grand"><td className="r">Total</td><td className="r">{inr(b.totalAmount)}</td></tr>

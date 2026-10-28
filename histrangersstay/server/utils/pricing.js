@@ -53,13 +53,30 @@ async function buildFoodLines(items = []) {
   });
 }
 
-// Single place where every booking amount is calculated.
-function totals({ nightlyRate, nights, discount = 0, food = [], taxPercent = 5 }) {
-  const subtotal = nights * nightlyRate;
-  const foodTotal = food.reduce((s, l) => s + l.total, 0);
-  const taxable = Math.max(0, subtotal - discount) + foodTotal;
-  const taxes = Math.round(taxable * (taxPercent / 100));
-  return { subtotal, discount, foodTotal, taxPercent, taxes, totalAmount: taxable + taxes };
+// Meal plan chosen by key -> priced snapshot taken from the hotel's live plan (never trust client prices).
+// Price is per guest per day; days = nights. Returns null when no plan is chosen.
+function buildMealPlan(hotel, key, { guests, nights }) {
+  const k = String(key || '').trim();
+  if (!k || k === 'none') return null;
+  const mp = hotel?.mealPlan;
+  if (!mp || mp.enabled === false) throw err('Meal plans are not available right now');
+  const opt = (mp.options || []).find((o) => o.key === k);
+  if (!opt) throw err('The selected meal plan is not available');
+  const g = Math.max(1, Math.floor(Number(guests)) || 1);
+  const days = Math.max(1, Math.floor(Number(nights)) || 1);
+  return {
+    key: opt.key, name: opt.name, includes: [...(opt.includes || [])],
+    pricePerPerson: opt.price, guests: g, days, total: opt.price * g * days,
+  };
 }
 
-module.exports = { resolveCoupon, buildFoodLines, totals, err };
+// Single place where every booking amount is calculated.
+function totals({ nightlyRate, nights, discount = 0, food = [], mealTotal = 0, taxPercent = 5 }) {
+  const subtotal = nights * nightlyRate;
+  const foodTotal = food.reduce((s, l) => s + l.total, 0);
+  const taxable = Math.max(0, subtotal - discount) + foodTotal + mealTotal;
+  const taxes = Math.round(taxable * (taxPercent / 100));
+  return { subtotal, discount, foodTotal, mealTotal, taxPercent, taxes, totalAmount: taxable + taxes };
+}
+
+module.exports = { resolveCoupon, buildFoodLines, buildMealPlan, totals, err };

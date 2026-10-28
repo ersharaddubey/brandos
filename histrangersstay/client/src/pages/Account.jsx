@@ -93,7 +93,7 @@ function FoodEditor({ booking, onClose, onSaved }) {
         </div>
         <div className="overflow-y-auto p-5">
           {kept.length > 0 && <p className="mb-4 rounded-xl bg-amber-50 p-3 text-sm text-amber-800">Some earlier items are no longer on the menu and will be removed when you save: {kept.map((l) => l.name).join(', ')}.</p>}
-          <FoodMenu items={menu} qty={qty} onQty={set} canOrder from="/account" />
+          <FoodMenu items={menu} qty={qty} onQty={set} canOrder stickyClass="top-0" />
         </div>
         <div className="flex flex-wrap items-center justify-between gap-3 border-t border-ink/10 p-5">
           <div><p className="text-xs uppercase tracking-widest text-ink/68">Food total (before tax)</p><p className="font-serif text-3xl font-semibold">{inr(total)}</p></div>
@@ -133,6 +133,12 @@ function BookingCard({ b, onFood, onCancel }) {
 
       <div className="mt-6 grid gap-6 md:grid-cols-2">
         <div>
+          {b.mealPlan && (
+            <div className="mb-4 rounded-2xl bg-white/50 p-4 text-sm">
+              <p className="font-semibold">Meal plan: {b.mealPlan.name}</p>
+              <p className="text-ink/75">{(b.mealPlan.includes || []).join(', ')} · {b.mealPlan.guests} {b.mealPlan.guests === 1 ? 'guest' : 'guests'} × {b.mealPlan.days} {b.mealPlan.days === 1 ? 'day' : 'days'} × {inr(b.mealPlan.pricePerPerson)} = <b>{inr(b.mealPlan.total)}</b></p>
+            </div>
+          )}
           <h4 className="flex items-center gap-2 text-lg font-semibold"><Utensils size={16} className="text-gold-700" />Food</h4>
           {(b.food || []).length === 0 ? <p className="mt-2 text-sm text-ink/70">No food ordered with this booking.</p> : (
             <ul className="mt-2 divide-y divide-ink/10 text-sm">
@@ -146,6 +152,7 @@ function BookingCard({ b, onFood, onCancel }) {
           <div className="mt-2 text-sm">
             <div className={row}><span>Room ({b.nights} {b.nights === 1 ? 'night' : 'nights'})</span><span>{inr(b.subtotal)}</span></div>
             {b.discount > 0 && <div className={`${row} text-emerald-700`}><span className="flex items-center gap-1.5"><Tag size={13} />Coupon {b.couponCode}</span><span>− {inr(b.discount)}</span></div>}
+            {b.mealTotal > 0 && <div className={row}><span>Meal plan</span><span>{inr(b.mealTotal)}</span></div>}
             {b.foodTotal > 0 && <div className={row}><span>Food</span><span>{inr(b.foodTotal)}</span></div>}
             <div className={row}><span>Taxes</span><span>{inr(b.taxes)}</span></div>
             <div className="mt-1 flex justify-between gap-4 border-t border-ink/10 pt-3 text-base font-semibold"><span>Total</span><span className="font-serif text-2xl">{inr(b.totalAmount)}</span></div>

@@ -24,6 +24,8 @@ router.post('/', limiter, asyncH(async (req, res) => {
   const order = await CafeOrder.create({
     customer: { name, phone }, orderType, place: String(req.body.place || '').trim(),
     note: String(req.body.note || '').trim(), items, subtotal, total: subtotal,
+    source: req.body.source === 'qr' ? 'qr' : 'web',
+    guest: req.body.guest === true,
   });
   res.status(201).json(order);
 }));

@@ -11,6 +11,7 @@ const links = [
   ['/admin/offers', 'Offers'],
   ['/admin/food', 'Food menu'],
   ['/admin/cafe', 'Cafe orders'],
+  ['/admin/cafe-qr', 'Cafe QR codes'],
   ['/admin/billing', 'Billing'],
   ['/admin/checkins', 'Web check-ins'],
   ['/admin/volunteers', 'Collab requests'],
