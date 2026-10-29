@@ -399,29 +399,23 @@ function Industries() {
             are directional context. The investable wedge is the lock layer inside these budgets.
           </p>
         </div>
-        <div className="table-wrap">
-          <table>
-            <thead>
-              <tr>
-                <th>Industry</th>
-                <th>Market context</th>
-                <th>How Brand OS is used</th>
-                <th>Core pain</th>
-              </tr>
-            </thead>
-            <tbody>
-              {INDUSTRIES.map((ind) => (
-                <tr key={ind.name}>
-                  <td>
-                    <strong>{ind.name}</strong>
-                  </td>
-                  <td>{ind.market}</td>
-                  <td>{ind.use}</td>
-                  <td>{ind.pain}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+        <div className="industry-grid">
+          {INDUSTRIES.map((ind, i) => (
+            <article className="industry-card" key={ind.name}>
+              <div className="industry-top">
+                <span className="industry-num">{String(i + 1).padStart(2, '0')}</span>
+                <h3>{ind.name}</h3>
+              </div>
+              <dl>
+                <dt>Market context</dt>
+                <dd>{ind.market}</dd>
+                <dt>How Brand OS is used</dt>
+                <dd>{ind.use}</dd>
+                <dt className="pain-label">Core pain</dt>
+                <dd className="pain">{ind.pain}</dd>
+              </dl>
+            </article>
+          ))}
         </div>
         <div className="card" style={{ marginTop: 16 }}>
           <h3>How we size “our” market</h3>
@@ -563,11 +557,11 @@ function Invest() {
             <tbody>
               {FUND_USE.map((f) => (
                 <tr key={f.area}>
-                  <td>
+                  <td data-label="Use of funds">
                     <strong>{f.area}</strong>
                   </td>
-                  <td>{f.pct}</td>
-                  <td>{f.why}</td>
+                  <td data-label="Share">{f.pct}</td>
+                  <td data-label="Rationale">{f.why}</td>
                 </tr>
               ))}
             </tbody>
@@ -583,7 +577,7 @@ function Invest() {
           </ul>
         </div>
         <p style={{ marginTop: 16, color: 'var(--muted)', fontSize: '0.9rem' }}>
-          Contact: <a href="mailto:ersharaddubey@gmail.com">ersharaddubey@gmail.com</a>. Product access is admin-only; there
+          Contact: <a href="mailto:brandos@rhodeotech.com">brandos@rhodeotech.com</a>. Product access is admin-only; there
           is no public self-registration.
         </p>
       </div>
