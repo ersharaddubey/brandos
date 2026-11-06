@@ -1,0 +1,177 @@
+{
+  "project": "BrandStudio",
+  "suite": "Phase 2 Autonomous QA",
+  "runId": "1793688200509-1r31il",
+  "startedAt": "2026-11-03T06:43:20.509Z",
+  "finishedAt": "2026-11-03T06:43:22.928Z",
+  "targets": {
+    "ui": "http://localhost:5173",
+    "api": "http://localhost:5002"
+  },
+  "environment": {
+    "databaseConnected": true,
+    "generator": "mock",
+    "isolatedQaDatabaseDetected": false,
+    "credentialsConfigured": false,
+    "destructiveTestsEnabled": false
+  },
+  "counts": {
+    "PASS": 25,
+    "FAIL": 0,
+    "WARN": 4
+  },
+  "overall": "PARTIAL",
+  "results": [
+    {
+      "name": "UI /",
+      "status": "PASS",
+      "detail": "HTTP 200"
+    },
+    {
+      "name": "UI /identities",
+      "status": "PASS",
+      "detail": "HTTP 200"
+    },
+    {
+      "name": "UI /prompts",
+      "status": "PASS",
+      "detail": "HTTP 200"
+    },
+    {
+      "name": "UI /studio",
+      "status": "PASS",
+      "detail": "HTTP 200"
+    },
+    {
+      "name": "UI /check",
+      "status": "PASS",
+      "detail": "HTTP 200"
+    },
+    {
+      "name": "UI /assets",
+      "status": "PASS",
+      "detail": "HTTP 200"
+    },
+    {
+      "name": "UI /open-shelf",
+      "status": "PASS",
+      "detail": "HTTP 200"
+    },
+    {
+      "name": "UI /recycle",
+      "status": "PASS",
+      "detail": "HTTP 200"
+    },
+    {
+      "name": "UI /integrations",
+      "status": "PASS",
+      "detail": "HTTP 200"
+    },
+    {
+      "name": "UI /autonomy",
+      "status": "PASS",
+      "detail": "HTTP 200"
+    },
+    {
+      "name": "API health",
+      "status": "PASS",
+      "detail": "HTTP 200; db=true; generator=mock"
+    },
+    {
+      "name": "QA authentication",
+      "status": "WARN",
+      "detail": "Skipped: set QA_USERNAME and QA_PASSWORD"
+    },
+    {
+      "name": "Authenticated API suite",
+      "status": "WARN",
+      "detail": "Skipped because login credentials/token are unavailable"
+    },
+    {
+      "name": "Synthetic CRUD lifecycle",
+      "status": "WARN",
+      "detail": "Skipped. Requires QA_ALLOW_DESTRUCTIVE=true, QA_MONGODB_URI with database name containing qa/test, and QA credentials. Never use production DB."
+    },
+    {
+      "name": "Image upload/preview/storage",
+      "status": "WARN",
+      "detail": "Not executed: set QA_UPLOAD_URL to a QA-only upload endpoint; upload field name defaults to file."
+    },
+    {
+      "name": "Browser initial render",
+      "status": "PASS",
+      "detail": "HTTP 200; title=brandstudio — brandstudio"
+    },
+    {
+      "name": "React root mounted",
+      "status": "PASS",
+      "detail": "#root count=1"
+    },
+    {
+      "name": "Browser route /",
+      "status": "PASS",
+      "detail": "body text chars=81"
+    },
+    {
+      "name": "Browser route /identities",
+      "status": "PASS",
+      "detail": "body text chars=81"
+    },
+    {
+      "name": "Browser route /prompts",
+      "status": "PASS",
+      "detail": "body text chars=81"
+    },
+    {
+      "name": "Browser route /studio",
+      "status": "PASS",
+      "detail": "body text chars=81"
+    },
+    {
+      "name": "Browser route /check",
+      "status": "PASS",
+      "detail": "body text chars=81"
+    },
+    {
+      "name": "Browser route /assets",
+      "status": "PASS",
+      "detail": "body text chars=81"
+    },
+    {
+      "name": "Browser route /open-shelf",
+      "status": "PASS",
+      "detail": "body text chars=81"
+    },
+    {
+      "name": "Browser route /recycle",
+      "status": "PASS",
+      "detail": "body text chars=81"
+    },
+    {
+      "name": "Browser route /integrations",
+      "status": "PASS",
+      "detail": "body text chars=81"
+    },
+    {
+      "name": "Browser route /autonomy",
+      "status": "PASS",
+      "detail": "body text chars=81"
+    },
+    {
+      "name": "Browser JavaScript errors",
+      "status": "PASS",
+      "detail": "No console/page errors observed"
+    },
+    {
+      "name": "UI screenshot",
+      "status": "PASS",
+      "detail": "qa/reports/phase2-screenshot-1793688200509-1r31il.png"
+    }
+  ],
+  "safety": [
+    "No source code is modified automatically",
+    "Synthetic mutations run only with explicit isolated QA DB opt-in",
+    "No real AI generation is launched automatically",
+    "Never run destructive tests against production"
+  ]
+}

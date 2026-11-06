@@ -1,0 +1,134 @@
+import { v2 as cloudinary } from 'cloudinary';
+import path from 'path';
+
+/**
+ * Persistent image storage (Cloudinary).
+ *
+ * Local disk (server/uploads) is only a cache: on Render / Railway / Docker /
+ * every fresh zip deploy that folder is wiped, but MongoDB keeps the Asset rows,
+ * so images "disappear". Every stored image is therefore also uploaded here, and
+ * read back from here if the local file is missing.
+ *
+ * Env (either style works):
+ *   CLOUDINARY_CLOUD_NAME + CLOUDINARY_API_KEY + CLOUDINARY_API_SECRET
+ *   or a single CLOUDINARY_URL=cloudinary://<key>:<secret>@<cloud_name>
+ *
+ * If none are set, everything falls back to local-only.
+ *
+ * Note: Asset.imageFileId now stores the Cloudinary public_id.
+ */
+let enabled = null;
+
+function getClient() {
+  if (enabled !== null) return enabled ? cloudinary : null;
+  const { CLOUDINARY_URL, CLOUDINARY_CLOUD_NAME, CLOUDINARY_API_KEY, CLOUDINARY_API_SECRET } = process.env;
+  if (CLOUDINARY_URL) {
+    cloudinary.config({ secure: true }); // SDK reads CLOUDINARY_URL by itself
+    enabled = !!cloudinary.config().cloud_name;
+  } else if (CLOUDINARY_CLOUD_NAME && CLOUDINARY_API_KEY && CLOUDINARY_API_SECRET) {
+    cloudinary.config({
+      cloud_name: CLOUDINARY_CLOUD_NAME,
+      api_key: CLOUDINARY_API_KEY,
+      api_secret: CLOUDINARY_API_SECRET,
+      secure: true,
+    });
+    enabled = true;
+  } else {
+    enabled = false;
+  }
+  if (!enabled) {
+    console.warn('[storage] CLOUDINARY_* not set — images are stored on local disk only (they vanish on redeploy)');
+  }
+  return enabled ? cloudinary : null;
+}
+
+export const storageEnabled = () => !!getClient();
+
+const cleanFolder = (f) => String(f || '').replace(/^\/+|\/+$/g, '');
+const publicIdFrom = (fileName) =>
+  path.parse(String(fileName)).name.replace(/[^\w.-]/g, '_');
+
+/** Upload bytes. Returns { url, fileId } or null (never throws). */
+export async function uploadBuffer(buffer, fileName, folder = 'brandstudio/assets') {
+  const cl = getClient();
+  if (!cl) return null;
+  return new Promise((resolve) => {
+    const stream = cl.uploader.upload_stream(
+      {
+        folder: cleanFolder(folder),
+        public_id: publicIdFrom(fileName),
+        resource_type: 'auto',
+        overwrite: true,
+        unique_filename: false,
+        use_filename: false,
+      },
+      (err, r) => {
+        if (err || !r) {
+          console.error('[storage] Cloudinary upload failed:', err?.message || 'no response');
+          return resolve(null);
+        }
+        resolve({ url: r.secure_url, fileId: r.public_id });
+      }
+    );
+    stream.end(buffer);
+  });
+}
+
+/**
+ * Upload from a remote URL or a base64 data URI (Cloudinary fetches it itself).
+ * Returns { url, fileId, thumbnail } or null (never throws).
+ */
+export async function uploadFromSource(source, fileName = 'generated', folder = 'brandstudio/generated') {
+  const cl = getClient();
+  if (!cl) return null;
+  try {
+    const r = await cl.uploader.upload(source, {
+      folder: cleanFolder(folder),
+      public_id: `${publicIdFrom(fileName)}-${Date.now()}`,
+      resource_type: 'auto',
+      unique_filename: false,
+      use_filename: false,
+    });
+    const thumbnail = cl.url(r.public_id, {
+      resource_type: r.resource_type,
+      secure: true,
+      width: 300,
+      height: 300,
+      crop: 'limit',
+      fetch_format: 'auto',
+      quality: 'auto',
+    });
+    return { url: r.secure_url, fileId: r.public_id, thumbnail };
+  } catch (e) {
+    console.error('[storage] Cloudinary upload failed:', e.message);
+    return null;
+  }
+}
+
+/** Download bytes from a stored URL. Returns Buffer or null. */
+export async function downloadBuffer(url) {
+  if (!url) return null;
+  try {
+    const res = await fetch(url, { signal: AbortSignal.timeout(20000) });
+    if (!res.ok) return null;
+    return Buffer.from(await res.arrayBuffer());
+  } catch (e) {
+    console.error('[storage] Cloudinary download failed:', e.message);
+    return null;
+  }
+}
+
+export async function deleteRemote(publicId) {
+  const cl = getClient();
+  if (!cl || !publicId) return;
+  // Old assets saved while ImageKit was in use have a plain fileId (no folder path) — nothing to delete here.
+  if (!String(publicId).includes('/')) return;
+  try {
+    for (const resource_type of ['image', 'video']) {
+      const r = await cl.uploader.destroy(publicId, { resource_type, invalidate: true });
+      if (r?.result === 'ok') return;
+    }
+  } catch (e) {
+    console.warn('[storage] Cloudinary delete failed:', e.message);
+  }
+}

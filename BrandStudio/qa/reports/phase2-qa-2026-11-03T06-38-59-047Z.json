@@ -1,0 +1,112 @@
+{
+  "project": "BrandStudio",
+  "suite": "Phase 2 Autonomous QA",
+  "runId": "1793687938992-9qklwk",
+  "startedAt": "2026-11-03T06:38:58.992Z",
+  "finishedAt": "2026-11-03T06:38:59.047Z",
+  "targets": {
+    "ui": "http://localhost:5173",
+    "api": "http://localhost:5002"
+  },
+  "environment": {
+    "databaseConnected": true,
+    "generator": "mock",
+    "isolatedQaDatabaseDetected": false,
+    "credentialsConfigured": false,
+    "destructiveTestsEnabled": false
+  },
+  "counts": {
+    "PASS": 11,
+    "FAIL": 0,
+    "WARN": 5
+  },
+  "overall": "PARTIAL",
+  "results": [
+    {
+      "name": "UI /",
+      "status": "PASS",
+      "detail": "HTTP 200"
+    },
+    {
+      "name": "UI /identities",
+      "status": "PASS",
+      "detail": "HTTP 200"
+    },
+    {
+      "name": "UI /prompts",
+      "status": "PASS",
+      "detail": "HTTP 200"
+    },
+    {
+      "name": "UI /studio",
+      "status": "PASS",
+      "detail": "HTTP 200"
+    },
+    {
+      "name": "UI /check",
+      "status": "PASS",
+      "detail": "HTTP 200"
+    },
+    {
+      "name": "UI /assets",
+      "status": "PASS",
+      "detail": "HTTP 200"
+    },
+    {
+      "name": "UI /open-shelf",
+      "status": "PASS",
+      "detail": "HTTP 200"
+    },
+    {
+      "name": "UI /recycle",
+      "status": "PASS",
+      "detail": "HTTP 200"
+    },
+    {
+      "name": "UI /integrations",
+      "status": "PASS",
+      "detail": "HTTP 200"
+    },
+    {
+      "name": "UI /autonomy",
+      "status": "PASS",
+      "detail": "HTTP 200"
+    },
+    {
+      "name": "API health",
+      "status": "PASS",
+      "detail": "HTTP 200; db=true; generator=mock"
+    },
+    {
+      "name": "QA authentication",
+      "status": "WARN",
+      "detail": "Skipped: set QA_USERNAME and QA_PASSWORD"
+    },
+    {
+      "name": "Authenticated API suite",
+      "status": "WARN",
+      "detail": "Skipped because login credentials/token are unavailable"
+    },
+    {
+      "name": "Synthetic CRUD lifecycle",
+      "status": "WARN",
+      "detail": "Skipped. Requires QA_ALLOW_DESTRUCTIVE=true, QA_MONGODB_URI with database name containing qa/test, and QA credentials. Never use production DB."
+    },
+    {
+      "name": "Image upload/preview/storage",
+      "status": "WARN",
+      "detail": "Not executed: set QA_UPLOAD_URL to a QA-only upload endpoint; upload field name defaults to file."
+    },
+    {
+      "name": "Playwright browser suite",
+      "status": "WARN",
+      "detail": "Skipped/unavailable: Cannot find package 'playwright' imported from /Users/apple/Desktop/BrandStudio/qa/scripts/phase2.mjs. Install with npm install --save-dev playwright && npx playwright install chromium"
+    }
+  ],
+  "safety": [
+    "No source code is modified automatically",
+    "Synthetic mutations run only with explicit isolated QA DB opt-in",
+    "No real AI generation is launched automatically",
+    "Never run destructive tests against production"
+  ]
+}

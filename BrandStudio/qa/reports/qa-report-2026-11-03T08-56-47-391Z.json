@@ -1,0 +1,245 @@
+{
+  "project": "BrandStudio",
+  "mode": "read-only-local-smoke-test",
+  "startedAt": "2026-11-03T08:56:47.391Z",
+  "finishedAt": "2026-11-03T08:56:47.519Z",
+  "targets": {
+    "ui": "http://localhost:5173",
+    "api": "http://localhost:5002"
+  },
+  "environment": {
+    "databaseConnected": true,
+    "generator": "mock",
+    "unsplashConfigured": false
+  },
+  "counts": {
+    "PASS": 19,
+    "FAIL": 11,
+    "WARN": 6
+  },
+  "overall": "NEEDS_ATTENTION",
+  "results": [
+    {
+      "area": "Frontend",
+      "name": "Vite app responds",
+      "status": "FAIL",
+      "detail": "fetch failed"
+    },
+    {
+      "area": "Navigation",
+      "name": "SPA route /",
+      "status": "FAIL",
+      "detail": "fetch failed"
+    },
+    {
+      "area": "Navigation",
+      "name": "SPA route /identities",
+      "status": "FAIL",
+      "detail": "fetch failed"
+    },
+    {
+      "area": "Navigation",
+      "name": "SPA route /prompts",
+      "status": "FAIL",
+      "detail": "fetch failed"
+    },
+    {
+      "area": "Navigation",
+      "name": "SPA route /studio",
+      "status": "FAIL",
+      "detail": "fetch failed"
+    },
+    {
+      "area": "Navigation",
+      "name": "SPA route /check",
+      "status": "FAIL",
+      "detail": "fetch failed"
+    },
+    {
+      "area": "Navigation",
+      "name": "SPA route /assets",
+      "status": "FAIL",
+      "detail": "fetch failed"
+    },
+    {
+      "area": "Navigation",
+      "name": "SPA route /open-shelf",
+      "status": "FAIL",
+      "detail": "fetch failed"
+    },
+    {
+      "area": "Navigation",
+      "name": "SPA route /recycle",
+      "status": "FAIL",
+      "detail": "fetch failed"
+    },
+    {
+      "area": "Navigation",
+      "name": "SPA route /integrations",
+      "status": "FAIL",
+      "detail": "fetch failed"
+    },
+    {
+      "area": "Navigation",
+      "name": "SPA route /autonomy",
+      "status": "FAIL",
+      "detail": "fetch failed"
+    },
+    {
+      "area": "API",
+      "name": "Health endpoint",
+      "status": "PASS",
+      "detail": "HTTP 200; DB=true; Ollama=true; generator=mock"
+    },
+    {
+      "area": "Database",
+      "name": "MongoDB connection",
+      "status": "PASS",
+      "detail": "Connected"
+    },
+    {
+      "area": "Authentication",
+      "name": "Configured admin login",
+      "status": "PASS",
+      "detail": ""
+    },
+    {
+      "area": "Module API",
+      "name": "Session identity",
+      "status": "PASS",
+      "detail": "HTTP 200, 3ms; {\"username\":\"ersharaddubey@gmail.com\",\"role\":\"owner\",\"legacyAdmin\":true}"
+    },
+    {
+      "area": "Module API",
+      "name": "Dashboard statistics",
+      "status": "PASS",
+      "detail": "HTTP 200, 9ms; {\"identities\":0,\"locked\":0,\"assets\":0,\"generated\":0,\"prompts\":0,\"generations\":0,\"avgScore\":null}"
+    },
+    {
+      "area": "Module API",
+      "name": "Autonomous OS",
+      "status": "PASS",
+      "detail": "HTTP 200, 13ms; {\"mode\":\"human-approval\",\"executionEnabled\":false,\"agents\":[{\"_id\":\"6ae9a1cf596cee34cd876f09\",\"key\":"
+    },
+    {
+      "area": "Module API",
+      "name": "Identity Lock list",
+      "status": "PASS",
+      "detail": "HTTP 200, 3ms; []"
+    },
+    {
+      "area": "Module API",
+      "name": "Identity key metadata",
+      "status": "PASS",
+      "detail": "HTTP 200, 2ms; {\"character\":[\"face\",\"faceShape\",\"eyes\",\"eyebrows\",\"nose\",\"lips\",\"jawline\",\"facialHair\",\"skinTone\",\""
+    },
+    {
+      "area": "Module API",
+      "name": "Identity schema",
+      "status": "PASS",
+      "detail": "HTTP 200, 1ms; {\"types\":{\"character\":[{\"key\":\"face\",\"label\":\"Face\",\"scope\":\"identity\",\"weight\":3,\"fields\":[{\"key\":\""
+    },
+    {
+      "area": "Module API",
+      "name": "Prompt OS list",
+      "status": "PASS",
+      "detail": "HTTP 200, 4ms; []"
+    },
+    {
+      "area": "Module API",
+      "name": "Asset Bank list",
+      "status": "PASS",
+      "detail": "HTTP 200, 3ms; []"
+    },
+    {
+      "area": "Module API",
+      "name": "Asset search",
+      "status": "PASS",
+      "detail": "HTTP 200, 3ms; []"
+    },
+    {
+      "area": "Module API",
+      "name": "Duplicate asset scan",
+      "status": "PASS",
+      "detail": "HTTP 200, 3ms; []"
+    },
+    {
+      "area": "Module API",
+      "name": "Generation history",
+      "status": "PASS",
+      "detail": "HTTP 200, 3ms; []"
+    },
+    {
+      "area": "Module API",
+      "name": "Asset groups",
+      "status": "PASS",
+      "detail": "HTTP 200, 5ms; [{\"_id\":\"6ae99f1f466dda149bf5a7d9\",\"name\":\"brandstudio brand\",\"companyName\":\"brandstudio\",\"type\":\"br"
+    },
+    {
+      "area": "Module API",
+      "name": "Recycle Bin",
+      "status": "PASS",
+      "detail": "HTTP 200, 1ms; []"
+    },
+    {
+      "area": "Module API",
+      "name": "Integration status",
+      "status": "PASS",
+      "detail": "HTTP 200, 4ms; {\"invokeai\":{\"name\":\"invokeai\",\"url\":\"http://127.0.0.1:9090\",\"reachable\":false,\"error\":\"fetch failed"
+    },
+    {
+      "area": "Module API",
+      "name": "A1111 provider status",
+      "status": "WARN",
+      "detail": "HTTP 503, 3ms; {\"provider\":\"a1111\",\"selected\":false,\"settings\":{\"steps\":28,\"cfgScale\":7,\"sampler\":\"DPM++ 2M Karras\""
+    },
+    {
+      "area": "Module API",
+      "name": "ComfyUI provider status",
+      "status": "WARN",
+      "detail": "HTTP 503, 4ms; {\"provider\":\"comfyui\",\"selected\":false,\"workflowPathConfigured\":false,\"workflowPath\":null,\"configure"
+    },
+    {
+      "area": "Module API",
+      "name": "InstantID provider status",
+      "status": "WARN",
+      "detail": "HTTP 503, 2ms; {\"provider\":\"comfyui\",\"mode\":\"instantid\",\"selected\":false,\"reachable\":false,\"url\":\"http://127.0.0.1:"
+    },
+    {
+      "area": "Module API",
+      "name": "Grounded SAM 2 status",
+      "status": "WARN",
+      "detail": "HTTP 503, 2ms; {\"provider\":\"grounded-sam-2\",\"enabled\":false,\"reachable\":false,\"url\":\"http://127.0.0.1:8091\",\"segmen"
+    },
+    {
+      "area": "Unsplash",
+      "name": "API integration",
+      "status": "WARN",
+      "detail": "UNSPLASH_ACCESS_KEY not configured; add it to server/.env. No scraping or guessed image URLs are used."
+    },
+    {
+      "area": "Static audit",
+      "name": "Feature page source files",
+      "status": "PASS",
+      "detail": "11/11 expected page files found"
+    },
+    {
+      "area": "Data safety",
+      "name": "Non-destructive test mode",
+      "status": "PASS",
+      "detail": "This runner performs GET checks and one authentication request only. It does not create, update, delete, upload or generate app records."
+    },
+    {
+      "area": "Coverage limitation",
+      "name": "Write workflows / uploads / generation / delete-restore",
+      "status": "WARN",
+      "detail": "Not executed by this safe smoke run. These require a dedicated QA database and explicit opt-in fixture setup."
+    }
+  ],
+  "recommendations": [
+    "Configure Unsplash Access Key in server/.env; keep it server-side and never expose it in Vite client variables.",
+    "Use a separate QA MongoDB database before enabling synthetic create/update/delete tests.",
+    "Add browser-level Playwright tests and upload/generation fixtures after QA database isolation is verified.",
+    "Do not remove a feature solely because it appears unused; require usage evidence and owner approval."
+  ]
+}

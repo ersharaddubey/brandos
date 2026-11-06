@@ -1,0 +1,23 @@
+{
+  "expo": {
+    "name": "Govt Exam Quiz",
+    "slug": "quiz-app",
+    "version": "2.0.0",
+    "orientation": "portrait",
+    "userInterfaceStyle": "light",
+    "sdkVersion": "58.0.0",
+    "splash": {
+      "resizeMode": "contain",
+      "backgroundColor": "#2D6A4F"
+    },
+    "ios": {
+      "supportsTablet": true
+    },
+    "android": {
+      "adaptiveIcon": {
+        "backgroundColor": "#2D6A4F"
+      },
+      "usesCleartextTraffic": true
+    }
+  }
+}

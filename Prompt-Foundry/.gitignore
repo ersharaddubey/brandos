@@ -8,3 +8,7 @@ dist/
 build/
 .vercel
 .env*
+.env*
+*.jks
+*.keystore
+.DS_Store

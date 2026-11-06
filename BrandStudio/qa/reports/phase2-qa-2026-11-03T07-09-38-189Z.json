@@ -1,0 +1,112 @@
+{
+  "project": "BrandStudio",
+  "suite": "Phase 2 Autonomous QA",
+  "runId": "1793689777685-wv2o02",
+  "startedAt": "2026-11-03T07:09:37.685Z",
+  "finishedAt": "2026-11-03T07:09:38.189Z",
+  "targets": {
+    "ui": "http://localhost:5173",
+    "api": "http://localhost:5002"
+  },
+  "environment": {
+    "databaseConnected": false,
+    "generator": "unknown",
+    "isolatedQaDatabaseDetected": false,
+    "credentialsConfigured": false,
+    "destructiveTestsEnabled": false
+  },
+  "counts": {
+    "PASS": 0,
+    "FAIL": 11,
+    "WARN": 5
+  },
+  "overall": "FAIL",
+  "results": [
+    {
+      "name": "UI /",
+      "status": "FAIL",
+      "detail": "fetch failed"
+    },
+    {
+      "name": "UI /identities",
+      "status": "FAIL",
+      "detail": "fetch failed"
+    },
+    {
+      "name": "UI /prompts",
+      "status": "FAIL",
+      "detail": "fetch failed"
+    },
+    {
+      "name": "UI /studio",
+      "status": "FAIL",
+      "detail": "fetch failed"
+    },
+    {
+      "name": "UI /check",
+      "status": "FAIL",
+      "detail": "fetch failed"
+    },
+    {
+      "name": "UI /assets",
+      "status": "FAIL",
+      "detail": "fetch failed"
+    },
+    {
+      "name": "UI /open-shelf",
+      "status": "FAIL",
+      "detail": "fetch failed"
+    },
+    {
+      "name": "UI /recycle",
+      "status": "FAIL",
+      "detail": "fetch failed"
+    },
+    {
+      "name": "UI /integrations",
+      "status": "FAIL",
+      "detail": "fetch failed"
+    },
+    {
+      "name": "UI /autonomy",
+      "status": "FAIL",
+      "detail": "fetch failed"
+    },
+    {
+      "name": "API health",
+      "status": "FAIL",
+      "detail": "fetch failed"
+    },
+    {
+      "name": "QA authentication",
+      "status": "WARN",
+      "detail": "Skipped: set QA_USERNAME and QA_PASSWORD"
+    },
+    {
+      "name": "Authenticated API suite",
+      "status": "WARN",
+      "detail": "Skipped because login credentials/token are unavailable"
+    },
+    {
+      "name": "Synthetic CRUD lifecycle",
+      "status": "WARN",
+      "detail": "Skipped. Requires QA_ALLOW_DESTRUCTIVE=true, QA_MONGODB_URI with database name containing qa/test, and QA credentials. Never use production DB."
+    },
+    {
+      "name": "Image upload/preview/storage",
+      "status": "WARN",
+      "detail": "Not executed: set QA_UPLOAD_URL to a QA-only upload endpoint; upload field name defaults to file."
+    },
+    {
+      "name": "Playwright browser suite",
+      "status": "WARN",
+      "detail": "Skipped/unavailable: page.goto: net::ERR_CONNECTION_REFUSED at http://localhost:5173/\nCall log:\n\u001b[2m  - navigating to \"http://localhost:5173/\", waiting until \"networkidle\"\u001b[22m\n. Install with npm install --save-dev playwright && npx playwright install chromium"
+    }
+  ],
+  "safety": [
+    "No source code is modified automatically",
+    "Synthetic mutations run only with explicit isolated QA DB opt-in",
+    "No real AI generation is launched automatically",
+    "Never run destructive tests against production"
+  ]
+}

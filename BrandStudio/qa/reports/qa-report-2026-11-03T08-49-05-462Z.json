@@ -1,0 +1,149 @@
+{
+  "project": "BrandStudio",
+  "mode": "read-only-local-smoke-test",
+  "startedAt": "2026-11-03T08:49:05.462Z",
+  "finishedAt": "2026-11-03T08:49:06.029Z",
+  "targets": {
+    "ui": "http://localhost:5173",
+    "api": "http://localhost:5002"
+  },
+  "environment": {
+    "databaseConnected": true,
+    "generator": "mock",
+    "unsplashConfigured": false
+  },
+  "counts": {
+    "PASS": 16,
+    "FAIL": 1,
+    "WARN": 3
+  },
+  "overall": "NEEDS_ATTENTION",
+  "results": [
+    {
+      "area": "Frontend",
+      "name": "Vite app responds",
+      "status": "PASS",
+      "detail": "HTTP 200, 19ms; <!doctype html> <html lang=\"en\"> <head> <script type=\"module\">import { injectIntoGlobalHook } from \"/@re"
+    },
+    {
+      "area": "Frontend",
+      "name": "React root mount exists",
+      "status": "PASS",
+      "detail": ""
+    },
+    {
+      "area": "Navigation",
+      "name": "SPA route /",
+      "status": "PASS",
+      "detail": "HTTP 200"
+    },
+    {
+      "area": "Navigation",
+      "name": "SPA route /identities",
+      "status": "PASS",
+      "detail": "HTTP 200"
+    },
+    {
+      "area": "Navigation",
+      "name": "SPA route /prompts",
+      "status": "PASS",
+      "detail": "HTTP 200"
+    },
+    {
+      "area": "Navigation",
+      "name": "SPA route /studio",
+      "status": "PASS",
+      "detail": "HTTP 200"
+    },
+    {
+      "area": "Navigation",
+      "name": "SPA route /check",
+      "status": "PASS",
+      "detail": "HTTP 200"
+    },
+    {
+      "area": "Navigation",
+      "name": "SPA route /assets",
+      "status": "PASS",
+      "detail": "HTTP 200"
+    },
+    {
+      "area": "Navigation",
+      "name": "SPA route /open-shelf",
+      "status": "PASS",
+      "detail": "HTTP 200"
+    },
+    {
+      "area": "Navigation",
+      "name": "SPA route /recycle",
+      "status": "PASS",
+      "detail": "HTTP 200"
+    },
+    {
+      "area": "Navigation",
+      "name": "SPA route /integrations",
+      "status": "PASS",
+      "detail": "HTTP 200"
+    },
+    {
+      "area": "Navigation",
+      "name": "SPA route /autonomy",
+      "status": "PASS",
+      "detail": "HTTP 200"
+    },
+    {
+      "area": "API",
+      "name": "Health endpoint",
+      "status": "PASS",
+      "detail": "HTTP 200; DB=true; Ollama=true; generator=mock"
+    },
+    {
+      "area": "Database",
+      "name": "MongoDB connection",
+      "status": "PASS",
+      "detail": "Connected"
+    },
+    {
+      "area": "Authentication",
+      "name": "Configured admin login",
+      "status": "FAIL",
+      "detail": "HTTP 401; credentials rejected"
+    },
+    {
+      "area": "Module API",
+      "name": "Protected feature endpoints",
+      "status": "WARN",
+      "detail": "Skipped because a valid QA login was not available."
+    },
+    {
+      "area": "Unsplash",
+      "name": "API integration",
+      "status": "WARN",
+      "detail": "UNSPLASH_ACCESS_KEY not configured; add it to server/.env. No scraping or guessed image URLs are used."
+    },
+    {
+      "area": "Static audit",
+      "name": "Feature page source files",
+      "status": "PASS",
+      "detail": "11/11 expected page files found"
+    },
+    {
+      "area": "Data safety",
+      "name": "Non-destructive test mode",
+      "status": "PASS",
+      "detail": "This runner performs GET checks and one authentication request only. It does not create, update, delete, upload or generate app records."
+    },
+    {
+      "area": "Coverage limitation",
+      "name": "Write workflows / uploads / generation / delete-restore",
+      "status": "WARN",
+      "detail": "Not executed by this safe smoke run. These require a dedicated QA database and explicit opt-in fixture setup."
+    }
+  ],
+  "recommendations": [
+    "Configure Unsplash Access Key in server/.env; keep it server-side and never expose it in Vite client variables.",
+    "Use a separate QA MongoDB database before enabling synthetic create/update/delete tests.",
+    "Add browser-level Playwright tests and upload/generation fixtures after QA database isolation is verified.",
+    "Do not remove a feature solely because it appears unused; require usage evidence and owner approval."
+  ]
+}

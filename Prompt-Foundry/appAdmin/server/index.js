@@ -4,7 +4,7 @@ import { fileURLToPath } from 'url';
 import express from 'express';
 import mongoose from 'mongoose';
 import cors from 'cors';
-import cloudinary from 'cloudinary';
+import User from './models/User.js';
 import authRoutes from './routes/auth.js';
 import promptRoutes from './routes/prompts.js';
 import userRoutes from './routes/user.js';
@@ -14,13 +14,6 @@ import categoryRoutes from './routes/categories.js';
 import paymentRoutes from './routes/payment.js';
 import featuresRoutes from './routes/features.js';
 import notificationRoutes from './routes/notifications.js';
-
-cloudinary.v2.config({
-  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
-  api_key: process.env.CLOUDINARY_API_KEY,
-  api_secret: process.env.CLOUDINARY_API_SECRET,
-  secure: true,
-});
 
 const app = express();
 const PORT = process.env.PORT || 5001;
@@ -40,6 +33,39 @@ async function connectDB() {
   return cached.conn;
 }
 
+
+let testUserSetupPromise;
+async function ensureTestUser() {
+  if (String(process.env.FREE_TESTING_MODE || '').toLowerCase() !== 'true') return;
+  const email = String(process.env.TEST_USER_EMAIL || '').trim().toLowerCase();
+  const password = String(process.env.TEST_USER_PASSWORD || '');
+  if (!email || !password) {
+    console.warn('Free testing mode is enabled, but TEST_USER_EMAIL or TEST_USER_PASSWORD is missing.');
+    return;
+  }
+  if (!testUserSetupPromise) {
+    testUserSetupPromise = (async () => {
+      let user = await User.findOne({ email });
+      if (!user) {
+        user = await User.create({ name: 'Prompt Foundry Tester', email, password, credits: 0, dailyCredits: 0 });
+        console.log(`Created dedicated free testing account: ${email}`);
+      } else {
+        const passwordMatches = await user.comparePassword(password);
+        if (!passwordMatches || user.name !== 'Prompt Foundry Tester') {
+          user.password = password;
+          user.name = 'Prompt Foundry Tester';
+          await user.save();
+        }
+      }
+    })().catch((error) => {
+      testUserSetupPromise = null;
+      console.error('Could not provision test account:', error.message);
+      throw error;
+    });
+  }
+  await testUserSetupPromise;
+}
+
 app.use(cors());
 app.use(express.json({ limit: '15mb' }));
 app.use(express.urlencoded({ extended: true, limit: '15mb' }));
@@ -48,6 +74,7 @@ app.use(express.urlencoded({ extended: true, limit: '15mb' }));
 app.use(async (req, res, next) => {
   try {
     await connectDB();
+    await ensureTestUser();
     next();
   } catch (err) {
     console.error('DB error:', err);
@@ -75,7 +102,7 @@ app.get('/', (req, res) => {
 
 // Local only
 if (process.env.VERCEL !== '1') {
-  connectDB().then(() => {
+  connectDB().then(ensureTestUser).then(() => {
     app.listen(PORT, '0.0.0.0', () => {
       console.log(`🚀 Server running on http://localhost:${PORT}`);
     });

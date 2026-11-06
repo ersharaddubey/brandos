@@ -68,6 +68,7 @@ export default function Admin() {
   const [challengeForm, setChallengeForm] = useState({ theme: '', description: '', date: '' });
   const [challengeSaving, setChallengeSaving] = useState(false);
   const [todayChallenge, setTodayChallenge] = useState(null);
+  const [aiStatus, setAiStatus] = useState(null);
 
   useEffect(() => {
     if (!user) navigate('/login');
@@ -136,6 +137,7 @@ export default function Admin() {
     fetchPromos();
     fetchNotifications();
     fetchTodayChallenge();
+    api.get('/generate/provider-status').then(({ data }) => setAiStatus(data)).catch(() => setAiStatus(null));
   }, [search, categoryFilter]);
 
   const openCreate = () => {
@@ -390,6 +392,7 @@ export default function Admin() {
             { id: 'categories', label: 'Categories' },
             { id: 'challenge', label: 'Daily Challenge' },
             { id: 'notifications', label: 'Notifications' },
+            { id: 'ai', label: 'AI Image API' },
           ].map((t) => (
             <button
               key={t.id}
@@ -409,6 +412,27 @@ export default function Admin() {
           <div className="mb-4 px-4 py-2.5 rounded-lg bg-dark-700 text-sm text-gray-200 border border-dark-600">
             {message}
           </div>
+        )}
+
+        {/* ========== AI IMAGE API TAB ========== */}
+        {tab === 'ai' && (
+          <section className="max-w-3xl rounded-2xl border border-dark-600 bg-dark-800 p-6 text-white">
+            <h2 className="text-xl font-semibold mb-2">Cloudflare Workers AI · FLUX.1 Schnell</h2>
+            <p className="text-sm text-gray-400 mb-5">API credentials are read securely from the backend environment. Secret keys are never sent to this panel or the mobile app.</p>
+            <div className="grid gap-3 sm:grid-cols-2 mb-5">
+              <div className="rounded-xl bg-dark-700 p-4"><p className="text-xs text-gray-400">Provider configuration</p><p className="font-medium mt-1">{aiStatus?.configured ? 'Configured' : 'Not configured'}</p></div>
+              <div className="rounded-xl bg-dark-700 p-4"><p className="text-xs text-gray-400">Free testing mode</p><p className="font-medium mt-1">{aiStatus?.freeTestingMode ? 'ON · test account only' : 'OFF · credits required'}</p></div>
+              <div className="rounded-xl bg-dark-700 p-4"><p className="text-xs text-gray-400">Image storage</p><p className="font-medium mt-1">ImageKit · {aiStatus?.storageConfigured ? 'Configured' : 'Not configured'}</p></div>
+              <div className="rounded-xl bg-dark-700 p-4 sm:col-span-2"><p className="text-xs text-gray-400">Test login</p><p className="font-medium mt-1">{aiStatus?.testUserEmail || 'Set TEST_USER_EMAIL on backend'}</p><p className="text-xs text-gray-400 mt-1">Free image generation is restricted to this account.</p></div>
+              <div className="rounded-xl bg-dark-700 p-4 sm:col-span-2"><p className="text-xs text-gray-400">Model</p><p className="font-medium mt-1 break-all">{aiStatus?.model || '@cf/black-forest-labs/flux-1-schnell'}</p></div>
+            </div>
+            <div className="rounded-xl border border-dark-600 p-4 text-sm text-gray-300">
+              <p className="font-semibold text-white mb-2">Backend environment variables</p>
+              <code className="block whitespace-pre-wrap text-xs leading-6">CLOUDFLARE_API_TOKEN=your_rotated_token\nCLOUDFLARE_ACCOUNT_ID=your_account_id\nCLOUDFLARE_IMAGE_MODEL=@cf/black-forest-labs/flux-1-schnell\nFREE_TESTING_MODE=true</code>
+              <p className="mt-3 text-xs text-amber-300">Set these variables on the backend host, then redeploy/restart. The test account is created automatically. Never put private keys in the frontend or APK.</p>
+            </div>
+            <button onClick={() => api.get('/generate/provider-status').then(({ data }) => setAiStatus(data)).catch(() => setMessage('Could not read AI provider status'))} className="mt-4 rounded-lg bg-violet-600 px-4 py-2 text-sm font-medium hover:bg-violet-500">Refresh status</button>
+          </section>
         )}
 
         {/* ========== PROMPTS TAB ========== */}

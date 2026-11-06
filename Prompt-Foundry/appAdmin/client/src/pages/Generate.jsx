@@ -10,7 +10,7 @@ import { useAuth } from '../context/AuthContext';
 import api from '../api/axios';
 
 const MODELS = [
-  { id: 'flux', name: 'Flux 2 Klein', credits: 2, type: 'Basic' },
+  { id: 'flux', name: 'Cloudflare FLUX.1 Schnell', credits: 2, type: 'Basic' },
   { id: 'gpt-image', name: 'GPT Image 2', credits: 8, type: 'Premium' },
   { id: 'seedream', name: 'Seedream 5.0', credits: 10, type: 'Premium' },
   { id: 'midjourney', name: 'Midjourney', credits: 12, type: 'Premium' },

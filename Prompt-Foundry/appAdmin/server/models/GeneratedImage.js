@@ -13,7 +13,7 @@ const generatedImageSchema = new mongoose.Schema(
     },
     imageUrl: {
       type: String,
-      required: true, // Cloudinary URL
+      required: true, // ImageKit CDN URL
     },
     cloudinaryPublicId: {
       type: String,

@@ -1,0 +1,28 @@
+# Render Blueprint — New + > Blueprint se repo connect karo.
+services:
+  - type: web
+    name: brandstudio
+    runtime: node
+    plan: starter            # free plan 15 min idle par sleep ho jata hai; queue/jobs ke liye starter lo
+    buildCommand: npm --prefix client install && npm --prefix client run build && npm --prefix server install
+    startCommand: npm --prefix server start
+    healthCheckPath: /api/health
+    envVars:
+      - key: NODE_VERSION
+        value: 20
+      - key: MONGO_URI
+        sync: false          # MongoDB Atlas connection string
+      - key: ADMIN_USERNAME
+        value: brandstudio
+      - key: ADMIN_PASSWORD
+        sync: false
+      - key: AUTH_SECRET
+        generateValue: true
+      - key: CLOUDINARY_CLOUD_NAME
+        sync: false
+      - key: CLOUDINARY_API_KEY
+        sync: false
+      - key: CLOUDINARY_API_SECRET
+        sync: false
+      - key: GENERATOR_PROVIDER
+        value: pollinations

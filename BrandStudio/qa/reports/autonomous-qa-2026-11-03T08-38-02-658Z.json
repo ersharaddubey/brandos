@@ -1,0 +1,252 @@
+{
+  "project": "BrandStudio",
+  "agent": "Autonomous QA Agent",
+  "version": "1.0.0",
+  "mode": "safe-smoke",
+  "runId": "59d3a494",
+  "startedAt": "2026-11-03T08:38:02.658Z",
+  "finishedAt": "2026-11-03T08:38:03.890Z",
+  "targets": {
+    "ui": "http://localhost:5173",
+    "api": "http://localhost:5002"
+  },
+  "environment": {
+    "databaseConnected": true,
+    "generator": "mock",
+    "credentialsConfigured": false,
+    "isolatedQaDatabaseDetected": false,
+    "screenshot": "qa/reports/qa-screenshot-59d3a494.png"
+  },
+  "counts": {
+    "PASS": 23,
+    "FAIL": 0,
+    "WARN": 8
+  },
+  "overall": "PARTIAL",
+  "results": [
+    {
+      "area": "Frontend",
+      "name": "UI responds",
+      "status": "PASS",
+      "detail": "HTTP 200, 18ms; <!doctype html> <html lang=\"en\"> <head> <script type=\"module\">import { injectIntoGlobalHook } ",
+      "suggestedFix": ""
+    },
+    {
+      "area": "Frontend",
+      "name": "React root mount",
+      "status": "PASS",
+      "detail": "Expected root element in HTML",
+      "suggestedFix": "Check client/index.html and the Vite entry point."
+    },
+    {
+      "area": "Navigation",
+      "name": "SPA route /",
+      "status": "PASS",
+      "detail": "HTTP 200",
+      "suggestedFix": "Check Vite SPA fallback and frontend router configuration."
+    },
+    {
+      "area": "Navigation",
+      "name": "SPA route /identities",
+      "status": "PASS",
+      "detail": "HTTP 200",
+      "suggestedFix": "Check Vite SPA fallback and frontend router configuration."
+    },
+    {
+      "area": "Navigation",
+      "name": "SPA route /prompts",
+      "status": "PASS",
+      "detail": "HTTP 200",
+      "suggestedFix": "Check Vite SPA fallback and frontend router configuration."
+    },
+    {
+      "area": "Navigation",
+      "name": "SPA route /studio",
+      "status": "PASS",
+      "detail": "HTTP 200",
+      "suggestedFix": "Check Vite SPA fallback and frontend router configuration."
+    },
+    {
+      "area": "Navigation",
+      "name": "SPA route /check",
+      "status": "PASS",
+      "detail": "HTTP 200",
+      "suggestedFix": "Check Vite SPA fallback and frontend router configuration."
+    },
+    {
+      "area": "Navigation",
+      "name": "SPA route /assets",
+      "status": "PASS",
+      "detail": "HTTP 200",
+      "suggestedFix": "Check Vite SPA fallback and frontend router configuration."
+    },
+    {
+      "area": "Navigation",
+      "name": "SPA route /open-shelf",
+      "status": "PASS",
+      "detail": "HTTP 200",
+      "suggestedFix": "Check Vite SPA fallback and frontend router configuration."
+    },
+    {
+      "area": "Navigation",
+      "name": "SPA route /recycle",
+      "status": "PASS",
+      "detail": "HTTP 200",
+      "suggestedFix": "Check Vite SPA fallback and frontend router configuration."
+    },
+    {
+      "area": "Navigation",
+      "name": "SPA route /integrations",
+      "status": "PASS",
+      "detail": "HTTP 200",
+      "suggestedFix": "Check Vite SPA fallback and frontend router configuration."
+    },
+    {
+      "area": "Navigation",
+      "name": "SPA route /autonomy",
+      "status": "PASS",
+      "detail": "HTTP 200",
+      "suggestedFix": "Check Vite SPA fallback and frontend router configuration."
+    },
+    {
+      "area": "API",
+      "name": "Health endpoint",
+      "status": "PASS",
+      "detail": "HTTP 200; db=true; ollama=true; generator=mock",
+      "suggestedFix": "Inspect server logs and /api/health implementation."
+    },
+    {
+      "area": "Database",
+      "name": "Database connection",
+      "status": "PASS",
+      "detail": "Connected",
+      "suggestedFix": "Check MongoDB availability and MONGO_URI."
+    },
+    {
+      "area": "Authentication",
+      "name": "Admin login",
+      "status": "WARN",
+      "detail": "Credentials not configured; protected endpoint checks skipped.",
+      "suggestedFix": "Set QA_USERNAME and QA_PASSWORD in environment or server/.env."
+    },
+    {
+      "area": "Module API",
+      "name": "Protected endpoints",
+      "status": "WARN",
+      "detail": "Skipped: no successful admin login.",
+      "suggestedFix": ""
+    },
+    {
+      "area": "Autonomy regression",
+      "name": "Idempotent agent seed",
+      "status": "WARN",
+      "detail": "Skipped: admin login unavailable.",
+      "suggestedFix": ""
+    },
+    {
+      "area": "CRUD",
+      "name": "Synthetic CRUD workflow",
+      "status": "WARN",
+      "detail": "Skipped: set QA_ALLOW_DESTRUCTIVE=true to opt in.",
+      "suggestedFix": "Use a dedicated QA database, set QA_MONGODB_URI plus QA_ALLOW_DESTRUCTIVE=true, and never target production."
+    },
+    {
+      "area": "Static audit",
+      "name": "Feature page source files",
+      "status": "PASS",
+      "detail": "11/11 expected files present",
+      "suggestedFix": "Review client/src/pages and update route/page imports."
+    },
+    {
+      "area": "Static audit",
+      "name": "Prompt CRUD route",
+      "status": "PASS",
+      "detail": "server/src/routes/prompts.js",
+      "suggestedFix": "Restore or update the expected module and app route registration."
+    },
+    {
+      "area": "Static audit",
+      "name": "Asset/upload route",
+      "status": "PASS",
+      "detail": "server/src/routes/assets.js",
+      "suggestedFix": "Restore or update the expected module and app route registration."
+    },
+    {
+      "area": "Static audit",
+      "name": "Recycle/restore route",
+      "status": "PASS",
+      "detail": "server/src/routes/recycle.js",
+      "suggestedFix": "Restore or update the expected module and app route registration."
+    },
+    {
+      "area": "Static audit",
+      "name": "Generation workflow",
+      "status": "PASS",
+      "detail": "server/src/services/generationRunner.js",
+      "suggestedFix": "Restore or update the expected module and app route registration."
+    },
+    {
+      "area": "Static audit",
+      "name": "Ollama adapter",
+      "status": "PASS",
+      "detail": "server/src/services/ollama.js",
+      "suggestedFix": "Restore or update the expected module and app route registration."
+    },
+    {
+      "area": "Browser",
+      "name": "Playwright page load",
+      "status": "PASS",
+      "detail": "HTTP 200; screenshot=qa/reports/qa-screenshot-59d3a494.png",
+      "suggestedFix": "Check browser console and frontend runtime."
+    },
+    {
+      "area": "Browser",
+      "name": "Uncaught page errors",
+      "status": "PASS",
+      "detail": "No uncaught page errors",
+      "suggestedFix": "Inspect browser stack traces and fix the first runtime exception."
+    },
+    {
+      "area": "Safety",
+      "name": "Production mutation guard",
+      "status": "PASS",
+      "detail": "CRUD tests only run with QA_ALLOW_DESTRUCTIVE=true and explicit QA_MONGODB_URI whose database name includes qa/test.",
+      "suggestedFix": ""
+    },
+    {
+      "area": "Coverage",
+      "name": "Image upload + preview/storage",
+      "status": "WARN",
+      "detail": "Not exercised automatically in this runner; avoid uploading fixtures until a QA-only storage prefix is configured.",
+      "suggestedFix": "Add a dedicated QA Cloudinary folder/local uploads directory and validate image metadata and preview with a known fixture."
+    },
+    {
+      "area": "Coverage",
+      "name": "AI generation providers",
+      "status": "WARN",
+      "detail": "Configured generator=mock; provider status endpoints checked, but generation jobs are not launched to avoid external costs.",
+      "suggestedFix": "Run provider-specific generation tests only with QA test credentials, explicit budget limits, and cleanup."
+    },
+    {
+      "area": "Coverage",
+      "name": "Recycle/restore round-trip",
+      "status": "WARN",
+      "detail": "Recycle endpoint is read-only in this run; restore is not invoked automatically.",
+      "suggestedFix": "Enable only after a dedicated QA database and QA-only fixtures are verified."
+    },
+    {
+      "area": "Repair",
+      "name": "Automatic source modification",
+      "status": "WARN",
+      "detail": "Agent proposes likely fixes in the report; it never rewrites application source automatically.",
+      "suggestedFix": "Review suggested fixes, patch code in version control, then rerun QA."
+    }
+  ],
+  "recommendations": [
+    "Use a dedicated QA MongoDB database and a QA-only storage prefix before mutation tests.",
+    "Configure Playwright for browser screenshots and client-side runtime errors.",
+    "Configure test-only image fixtures and provider budgets before upload or AI generation tests.",
+    "Keep suggested repairs human-reviewed; rerun the agent after each fix.",
+    "Never run destructive tests against production data."
+  ]
+}

@@ -1,0 +1,10 @@
+node_modules/
+.env
+.env.local
+.vercel
+client/dist
+server/uploads/*
+!server/uploads/.gitkeep
+
+# Local QA secrets
+server/.env.qa
